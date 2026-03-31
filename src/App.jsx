@@ -3,27 +3,9 @@ import { supabase } from "./supabase";
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 const PHASES = [
-  {
-    id: 1,
-    name: "Hypertrophy",
-    color: "#00ff88",
-    desc: "Volume-focused, 8-12 reps",
-    weeks: 4,
-  },
-  {
-    id: 2,
-    name: "Strength",
-    color: "#00cfff",
-    desc: "Heavy loads, 4-6 reps",
-    weeks: 4,
-  },
-  {
-    id: 3,
-    name: "Power",
-    color: "#ff6b35",
-    desc: "Explosive, 3-5 reps",
-    weeks: 4,
-  },
+  { id: 1, name: "Hypertrophy", icon: "💪", color: "#00ff88", desc: "Volume-focused, 8-12 reps", weeks: 4 },
+  { id: 2, name: "Strength",    icon: "🏋️", color: "#00cfff", desc: "Heavy loads, 4-6 reps",    weeks: 4 },
+  { id: 3, name: "Power",       icon: "⚡", color: "#ff6b35", desc: "Explosive, 3-5 reps",       weeks: 4 },
 ];
 
 const WORKOUTS = {
@@ -280,26 +262,28 @@ const setStore = (key, val) => {
   try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
 };
 
-const getPhaseAndDay = (workoutCount, exerciseLogs) => {
+const getPhaseAndDay = (workoutCount, exerciseLogs, phaseOverride) => {
   const count = workoutCount || 0;
-  // Each phase = 12 workouts (3 days/wk × 4 weeks)
   const WORKOUTS_PER_PHASE = 12;
-  const phaseIndex = Math.floor(count / WORKOUTS_PER_PHASE) % PHASES.length;
+  // phaseOverride lets user manually jump to a phase; it resets the day counter
+  const phaseIndex = phaseOverride != null
+    ? phaseOverride % PHASES.length
+    : Math.floor(count / WORKOUTS_PER_PHASE) % PHASES.length;
   const dayIndex = count % 3;
-  // Day within phase = workouts completed in this phase
-  const workoutsInPhase = count % WORKOUTS_PER_PHASE;
+  const workoutsInPhase = phaseOverride != null ? 0 : count % WORKOUTS_PER_PHASE;
 
-  // Find the date of the first workout in this phase from logs
+  // Day counter: days since first workout of current phase
   const sortedLogs = (exerciseLogs || [])
     .slice()
     .sort((a, b) => new Date(a.date) - new Date(b.date));
-  const phaseStartLogIndex = Math.floor(count / WORKOUTS_PER_PHASE) * WORKOUTS_PER_PHASE;
-  // Get unique workout dates in order
+  const phaseStartLogIndex = phaseOverride != null
+    ? null  // override resets counter — no reference date
+    : Math.floor(count / WORKOUTS_PER_PHASE) * WORKOUTS_PER_PHASE;
   const workoutDates = [...new Set(sortedLogs.map(l => l.date.split("T")[0]))];
-  const phaseFirstDate = workoutDates[phaseStartLogIndex] 
-    ? new Date(workoutDates[phaseStartLogIndex]) 
+  const phaseFirstDate = (phaseStartLogIndex != null && workoutDates[phaseStartLogIndex])
+    ? new Date(workoutDates[phaseStartLogIndex])
     : null;
-  
+
   let phaseDay = workoutsInPhase;
   if (phaseFirstDate) {
     const now = new Date();
@@ -311,6 +295,7 @@ const getPhaseAndDay = (workoutCount, exerciseLogs) => {
     dayKey: WORKOUT_DAYS[dayIndex],
     phaseDay: Math.min(phaseDay, 29),
     workoutsInPhase,
+    phaseIndex,
   };
 };
 
@@ -559,8 +544,10 @@ const S = {
 };
 
 // ─── HOME SCREEN ──────────────────────────────────────────────────────────────
-const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, workoutCount, workoutsInPhase, onStartWorkout, accentColor }) => {
-  const workout = WORKOUTS[phase.id][dayKey];
+const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, workoutCount, workoutsInPhase, onStartWorkout, onSetPhase, phaseIndex, accentColor }) => {
+  const [activeDayKey, setActiveDayKey] = useState(dayKey);
+  const workout = WORKOUTS[phase.id][activeDayKey];
+  const allWorkouts = WORKOUT_DAYS.map(d => ({ key: d, ...WORKOUTS[phase.id][d] }));
   // workoutCount comes from props
   const thisMonthCount = exerciseLogs.filter((l) => {
     const d = new Date(l.date);
@@ -597,9 +584,9 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
       <div style={{ padding: "0 16px" }}>
         {/* Phase Progress */}
         <div style={{ ...S.card("rgba(255,255,255,0.06)"), marginBottom: 12 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
             <div>
-              <div style={{ fontSize: 11, color: "#666", textTransform: "uppercase", letterSpacing: "0.08em" }}>Current Phase</div>
+              <div style={{ fontSize: 11, color: "#666", textTransform: "uppercase", letterSpacing: "0.08em" }}>Training Phase</div>
               <div style={{ fontSize: 19, fontWeight: 800, color: phase.color, marginTop: 2 }}>{phase.name}</div>
               <div style={{ fontSize: 12, color: "#777", marginTop: 2 }}>{phase.desc}</div>
             </div>
@@ -607,6 +594,26 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
               <div style={{ fontSize: 11, color: "#666", textTransform: "uppercase", letterSpacing: "0.08em" }}>Day</div>
               <div style={{ fontSize: 28, fontWeight: 900, color: "#fff" }}>{phaseDay}<span style={{ fontSize: 14, color: "#555" }}>/30</span></div>
             </div>
+          </div>
+          {/* Phase switcher pills */}
+          <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
+            {PHASES.map((p, i) => (
+              <button key={p.id} onClick={() => {
+                if (i === phaseIndex) return;
+                if (window.confirm(\`Switch to \${p.name}? Your day counter will reset.\`)) {
+                  onSetPhase(i);
+                }
+              }} style={{
+                flex: 1, padding: "8px 4px", borderRadius: 10, border: "none", cursor: "pointer",
+                background: i === phaseIndex ? p.color : "rgba(255,255,255,0.06)",
+                color: i === phaseIndex ? "#000" : "#666",
+                fontSize: 11, fontWeight: 700, transition: "all 0.2s",
+                outline: i === phaseIndex ? "none" : "1px solid rgba(255,255,255,0.08)",
+              }}>
+                <div style={{ fontSize: 13, marginBottom: 1 }}>{p.icon || "●"}</div>
+                <div>{p.name}</div>
+              </button>
+            ))}
           </div>
           {/* Progress bar */}
           <div style={{ background: "rgba(255,255,255,0.07)", borderRadius: 8, height: 6, overflow: "hidden" }}>
@@ -631,7 +638,8 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
 
         {/* Today's Workout Card */}
         <div style={{ ...S.card(`${accentColor}33`), marginBottom: 16, background: `linear-gradient(135deg, rgba(0,255,136,0.05), rgba(10,10,15,1))` }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
+          {/* Workout title row */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
             <div>
               <div style={S.tag(accentColor)}>Today's Workout</div>
               <div style={{ fontSize: 22, fontWeight: 800, marginTop: 8, letterSpacing: "-0.01em" }}>
@@ -644,6 +652,25 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
             <div style={{ ...S.tag(workout.cardio.type === "HIIT" ? "#ff6b35" : "#00cfff"), flexShrink: 0 }}>
               {workout.cardio.type}
             </div>
+          </div>
+
+          {/* Change workout picker */}
+          <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
+            {allWorkouts.map(w => (
+              <button key={w.key} onClick={() => setActiveDayKey(w.key)} style={{
+                flex: 1, padding: "8px 4px", borderRadius: 10, border: "none", cursor: "pointer",
+                background: activeDayKey === w.key ? accentColor : "rgba(255,255,255,0.06)",
+                color: activeDayKey === w.key ? "#000" : "#666",
+                fontSize: 11, fontWeight: 700, transition: "all 0.2s",
+                outline: activeDayKey === w.key ? "none" : "1px solid rgba(255,255,255,0.08)",
+              }}>
+                <div style={{ fontSize: 14, marginBottom: 1 }}>{w.icon}</div>
+                <div>{w.name.replace(/ (Hypertrophy|Strength|Power|Day)/, "")}</div>
+                {w.key === dayKey && (
+                  <div style={{ fontSize: 9, marginTop: 1, opacity: 0.7 }}>Scheduled</div>
+                )}
+              </button>
+            ))}
           </div>
           {/* Exercise list preview */}
           <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
@@ -666,7 +693,7 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
             )}
           </div>
 
-          <button style={S.bigBtn(accentColor)} onClick={onStartWorkout}>
+          <button style={S.bigBtn(accentColor)} onClick={() => onStartWorkout(activeDayKey)}>
             Start Workout →
           </button>
         </div>
@@ -698,47 +725,69 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
   );
 };
 
-// ─── REST TIMER ───────────────────────────────────────────────────────────────
-const RestTimer = ({ onDone, accentColor }) => {
-  const [seconds, setSeconds] = useState(90);
-  const [done, setDone] = useState(false);
-  const intervalRef = useRef(null);
+// ─── REST TIMER ────────────────────────────────
+const TIMER_KEY = "fitforge_timer_end";
 
-  // Ding sound via Web Audio API
-  const playDing = () => {
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const gain = ctx.createGain();
-      gain.connect(ctx.destination);
-      gain.gain.setValueAtTime(0.6, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
-      [523, 659, 784].forEach((freq, i) => {
-        const osc = ctx.createOscillator();
-        osc.type = "sine";
-        osc.frequency.value = freq;
-        osc.connect(gain);
-        osc.start(ctx.currentTime + i * 0.12);
-        osc.stop(ctx.currentTime + i * 0.12 + 0.4);
-      });
-    } catch(e) {}
-  };
+const playDing = () => {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const gain = ctx.createGain();
+    gain.connect(ctx.destination);
+    gain.gain.setValueAtTime(0.6, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
+    [523, 659, 784].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      osc.connect(gain);
+      osc.start(ctx.currentTime + i * 0.12);
+      osc.stop(ctx.currentTime + i * 0.12 + 0.4);
+    });
+  } catch(e) {}
+};
+
+const RestTimer = ({ onDone, accentColor }) => {
+  const DURATION = 90;
+  // Store absolute end time so timer survives tab switches and app backgrounding
+  const [endTime] = useState(() => {
+    const stored = localStorage.getItem(TIMER_KEY);
+    if (stored) {
+      const t = parseInt(stored);
+      if (t > Date.now()) return t;
+    }
+    const t = Date.now() + DURATION * 1000;
+    localStorage.setItem(TIMER_KEY, String(t));
+    return t;
+  });
+
+  const calcRemaining = () => Math.max(0, Math.round((endTime - Date.now()) / 1000));
+  const [seconds, setSeconds] = useState(calcRemaining);
+  const [done, setDone] = useState(() => calcRemaining() === 0);
+  const dingFired = useRef(false);
 
   useEffect(() => {
-    intervalRef.current = setInterval(() => {
-      setSeconds(s => {
-        if (s <= 1) {
-          clearInterval(intervalRef.current);
-          setDone(true);
-          playDing();
-          return 0;
-        }
-        return s - 1;
-      });
-    }, 1000);
-    return () => clearInterval(intervalRef.current);
-  }, []);
+    if (done) return;
+    const tick = () => {
+      const remaining = calcRemaining();
+      setSeconds(remaining);
+      if (remaining === 0) {
+        setDone(true);
+        localStorage.removeItem(TIMER_KEY);
+        if (!dingFired.current) { dingFired.current = true; playDing(); }
+      }
+    };
+    const id = setInterval(tick, 250);
+    const onVisible = () => { if (!document.hidden) tick(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => { clearInterval(id); document.removeEventListener("visibilitychange", onVisible); };
+  }, [done]);
 
-  const pct = seconds / 90;
+  const handleDone = () => {
+    localStorage.removeItem(TIMER_KEY);
+    onDone();
+  };
+
+  const pct = seconds / DURATION;
   const r = 44, cx = 50, cy = 50;
   const circ = 2 * Math.PI * r;
 
@@ -757,13 +806,13 @@ const RestTimer = ({ onDone, accentColor }) => {
         <circle cx={cx} cy={cy} r={r} fill="none" stroke={done ? "#00ff88" : accentColor} strokeWidth={6}
           strokeDasharray={circ} strokeDashoffset={circ * (1 - pct)}
           strokeLinecap="round" transform="rotate(-90 50 50)"
-          style={{ transition: "stroke-dashoffset 1s linear" }}/>
+          style={{ transition: "stroke-dashoffset 0.25s linear" }}/>
         <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central"
           fill={done ? "#00ff88" : "#fff"} fontSize={done ? 14 : 22} fontWeight={800}>
           {done ? "GO!" : `${seconds}s`}
         </text>
       </svg>
-      <button onClick={onDone} style={{
+      <button onClick={handleDone} style={{
         background: done ? "#00ff88" : "rgba(255,255,255,0.1)",
         border: "none", borderRadius: 14, padding: "14px 32px",
         color: done ? "#000" : "#aaa", fontSize: 15, fontWeight: 700, cursor: "pointer",
@@ -785,6 +834,19 @@ const CELEBRATIONS = [
   { emojis: "💎🦅🙌", msg: "Diamond mentality. Nothing stops you." },
   { emojis: "🔥😤👊", msg: "No days off. That's the standard you're setting." },
 ];
+
+// ─── DUMBBELL DETECTION ──────────────────────────────────────────────────────
+const isDumbbellExercise = (name) => {
+  if (!name) return false;
+  const n = name.toLowerCase();
+  return n.includes("db ") || n.startsWith("db ") || n.includes(" db ") ||
+    n.includes("dumbbell") || n.includes("incline db") ||
+    // specific exercises commonly done with dumbbells
+    ["lateral raises", "face pulls", "incline db press", "db shoulder press",
+     "db incline press", "db flat press", "bent-over db fly", "db front raise",
+     "db upright row", "db row", "db shrug", "db kickback", "db snatch",
+     "incline db curl", "concentration curl"].some(e => n.includes(e));
+};
 
 // ─── ADD EXERCISE PANEL ───────────────────────────────────────────────────────
 const AddExercisePanel = ({ workout, onAdd, onClose, accentColor }) => {
@@ -952,14 +1014,106 @@ const AddExercisePanel = ({ workout, onAdd, onClose, accentColor }) => {
   );
 };
 
+// ─── CELEBRATION SCREEN ───────────────────────────────────────────────────────
+const CelebrationScreen = ({ celebration, accentColor, onDone }) => {
+  const [visible, setVisible] = useState(false);
+  const [showBtn, setShowBtn] = useState(false);
+
+  useEffect(() => {
+    // Stagger entrance: emojis pop in, then text, then button
+    const t1 = setTimeout(() => setVisible(true), 80);
+    const t2 = setTimeout(() => setShowBtn(true), 2200);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, []);
+
+  return (
+    <div
+      onClick={showBtn ? onDone : undefined}
+      style={{
+        minHeight: "100vh", display: "flex", flexDirection: "column",
+        alignItems: "center", justifyContent: "center",
+        padding: 32, textAlign: "center",
+        background: "radial-gradient(ellipse at center, rgba(0,255,136,0.06) 0%, #0a0a0f 70%)",
+        cursor: showBtn ? "pointer" : "default",
+      }}
+    >
+      {/* Emojis — scale in */}
+      <div style={{
+        fontSize: 80, lineHeight: 1.2, marginBottom: 20,
+        transform: visible ? "scale(1)" : "scale(0.3)",
+        opacity: visible ? 1 : 0,
+        transition: "transform 0.5s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease",
+      }}>
+        {celebration.emojis}
+      </div>
+
+      {/* Title */}
+      <div style={{
+        fontSize: 30, fontWeight: 900, color: accentColor, marginBottom: 10,
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(20px)",
+        transition: "opacity 0.5s ease 0.3s, transform 0.5s ease 0.3s",
+      }}>
+        Workout Complete!
+      </div>
+
+      {/* Message */}
+      <div style={{
+        fontSize: 16, color: "#888", marginBottom: 56, lineHeight: 1.6, maxWidth: 280,
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(16px)",
+        transition: "opacity 0.5s ease 0.55s, transform 0.5s ease 0.55s",
+      }}>
+        {celebration.msg}
+      </div>
+
+      {/* Button — fades in after delay */}
+      <div style={{
+        width: "100%", maxWidth: 360,
+        opacity: showBtn ? 1 : 0,
+        transform: showBtn ? "translateY(0)" : "translateY(12px)",
+        transition: "opacity 0.4s ease, transform 0.4s ease",
+        pointerEvents: showBtn ? "auto" : "none",
+      }}>
+        <button style={S.bigBtn(accentColor)} onClick={onDone}>
+          Back to Dashboard
+        </button>
+        <div style={{ fontSize: 12, color: "#444", marginTop: 10 }}>
+          Tap anywhere to continue
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ─── WORKOUT SCREEN ───────────────────────────────────────────────────────────
-const WorkoutScreen = ({ phase, dayKey, exerciseLogs, onFinish, onLogExercise, accentColor, savedState, onSaveState }) => {
-  const baseWorkout = WORKOUTS[phase.id][dayKey];
+const WorkoutScreen = ({ phase, dayKey, exerciseLogs, onFinish, onLogExercise, accentColor, savedState, onSaveState, onChangeDay }) => {
+  const [activeDayKey, setActiveDayKey] = useState(() => savedState?.activeDayKey || dayKey);
+  const [showChangePicker, setShowChangePicker] = useState(false);
+  const baseWorkout = WORKOUTS[phase.id][activeDayKey];
 
   // ── Restore saved state or init fresh ────────────────────────────────────
-  const [exercises, setExercises] = useState(() =>
-    savedState?.exercises || baseWorkout.exercises
-  );
+  const [exercises, setExercises] = useState(() => {
+    if (savedState?.exercises) return savedState.exercises;
+    const raw = WORKOUTS[phase.id][savedState?.activeDayKey || dayKey].exercises;
+    // Deduplicate by name, preserving order
+    const seen = new Set();
+    return raw.filter(e => { if (seen.has(e.name)) return false; seen.add(e.name); return true; });
+  });
+
+  // When user picks a different day, reset all workout state
+  const handleChangeDay = (newDayKey) => {
+    setActiveDayKey(newDayKey);
+    setExercises(WORKOUTS[phase.id][newDayKey].exercises);
+    setCurrentExIdx(0);
+    setCompletedSets({});
+    setWeights({});
+    setReps({});
+    setSwappedExercises({});
+    setLoggedExercises({});
+    setPhase("workout");
+    setShowChangePicker(false);
+  };
   const [currentExIdx, setCurrentExIdx] = useState(() => savedState?.currentExIdx || 0);
   const [completedSets, setCompletedSets] = useState(() => savedState?.completedSets || {});
   const [weights, setWeights] = useState(() => savedState?.weights || {});
@@ -975,7 +1129,7 @@ const WorkoutScreen = ({ phase, dayKey, exerciseLogs, onFinish, onLogExercise, a
   useEffect(() => {
     onSaveState({
       exercises, currentExIdx, completedSets, weights, reps,
-      phase2, swappedExercises, loggedExercises,
+      phase2, swappedExercises, loggedExercises, activeDayKey,
     });
   }, [exercises, currentExIdx, completedSets, weights, reps, phase2, swappedExercises, loggedExercises]);
 
@@ -1070,7 +1224,10 @@ const WorkoutScreen = ({ phase, dayKey, exerciseLogs, onFinish, onLogExercise, a
 
   // ── Add exercise ──────────────────────────────────────────────────────────
   const handleAddExercise = (newEx) => {
-    setExercises(prev => [...prev, newEx]);
+    setExercises(prev => {
+      if (prev.some(e => e.name === newEx.name)) return prev; // already in workout
+      return [...prev, newEx];
+    });
   };
 
   // ── Edit set ─────────────────────────────────────────────────────────────
@@ -1086,14 +1243,7 @@ const WorkoutScreen = ({ phase, dayKey, exerciseLogs, onFinish, onLogExercise, a
   const celebration = CELEBRATIONS[Math.floor(Math.random() * CELEBRATIONS.length)];
 
   if (phase2 === "done") {
-    return (
-      <div style={{ ...S.scroll, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", minHeight:"80vh", padding:24, textAlign:"center" }}>
-        <div style={{ fontSize:72, marginBottom:8, lineHeight:1.2 }}>{celebration.emojis}</div>
-        <div style={{ fontSize:26, fontWeight:900, color:accentColor, marginBottom:8 }}>Workout Complete!</div>
-        <div style={{ fontSize:15, color:"#888", marginBottom:40, lineHeight:1.5 }}>{celebration.msg}</div>
-        <button style={S.bigBtn(accentColor)} onClick={() => onFinish([])}>Back to Dashboard</button>
-      </div>
-    );
+    return <CelebrationScreen celebration={celebration} accentColor={accentColor} onDone={() => onFinish([])} />;
   }
 
   if (phase2 === "cardio") {
@@ -1130,9 +1280,66 @@ const WorkoutScreen = ({ phase, dayKey, exerciseLogs, onFinish, onLogExercise, a
       {/* Header */}
       <div style={{ padding:"56px 4px 16px" }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-          <div style={{ fontSize:12, color:"#666", textTransform:"uppercase", letterSpacing:"0.08em" }}>{workout.name}</div>
+          <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+            <div style={{ fontSize:12, color:"#666", textTransform:"uppercase", letterSpacing:"0.08em" }}>{workout.name}</div>
+            {completedSets && Object.keys(completedSets).length === 0 && (
+              <button onClick={() => setShowChangePicker(true)} style={{
+                fontSize:10, color:accentColor, background:`${accentColor}15`,
+                border:`1px solid ${accentColor}33`, borderRadius:6,
+                padding:"2px 8px", cursor:"pointer", fontWeight:700, letterSpacing:"0.05em",
+              }}>CHANGE</button>
+            )}
+          </div>
           <div style={{ fontSize:12, color:"#666" }}>{currentExIdx + 1} / {exercises.length}</div>
         </div>
+
+        {/* Day picker sheet */}
+        {showChangePicker && (
+          <>
+            <div onClick={() => setShowChangePicker(false)} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.7)", zIndex:300, backdropFilter:"blur(4px)" }}/>
+            <div style={{
+              position:"fixed", bottom:0, left:"50%", transform:"translateX(-50%)",
+              width:"100%", maxWidth:430, background:"#111118",
+              borderRadius:"24px 24px 0 0", border:"1px solid rgba(255,255,255,0.1)",
+              borderBottom:"none", zIndex:301, padding:"0 0 48px",
+            }}>
+              <div style={{ display:"flex", justifyContent:"center", padding:"14px 0 0" }}>
+                <div style={{ width:40, height:4, borderRadius:2, background:"#333" }}/>
+              </div>
+              <div style={{ padding:"12px 20px 20px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                <div>
+                  <div style={{ fontSize:11, color:"#666", textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:3 }}>Switch Workout</div>
+                  <div style={{ fontSize:18, fontWeight:800 }}>Choose a different day</div>
+                </div>
+                <button onClick={() => setShowChangePicker(false)} style={{ background:"rgba(255,255,255,0.08)", border:"none", borderRadius:10, width:36, height:36, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#888", fontSize:18 }}>✕</button>
+              </div>
+              <div style={{ padding:"0 16px" }}>
+                {WORKOUT_DAYS.map(dk => {
+                  const w = WORKOUTS[phase.id][dk];
+                  const isActive = dk === activeDayKey;
+                  return (
+                    <button key={dk} onClick={() => handleChangeDay(dk)} style={{
+                      width:"100%", textAlign:"left", padding:"16px 18px", marginBottom:10,
+                      background: isActive ? `${accentColor}18` : "rgba(255,255,255,0.04)",
+                      border:`1px solid ${isActive ? accentColor+"55" : "rgba(255,255,255,0.08)"}`,
+                      borderRadius:16, cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center",
+                    }}>
+                      <div>
+                        <div style={{ fontSize:15, fontWeight:700, color: isActive ? accentColor : "#fff", marginBottom:3 }}>
+                          {w.icon} {w.name}
+                        </div>
+                        <div style={{ fontSize:12, color:"#666" }}>
+                          {w.exercises.map(e => e.muscle).filter((m,i,a) => a.indexOf(m)===i).join(" · ")}
+                        </div>
+                      </div>
+                      {isActive && <div style={{ fontSize:11, color:accentColor, fontWeight:700 }}>TODAY ✓</div>}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        )}
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginTop:6, gap:10 }}>
           <div style={{ flex:1 }}>
             <div style={{ fontSize:22, fontWeight:800, lineHeight:1.2 }}>{ex.name}</div>
@@ -1195,12 +1402,35 @@ const WorkoutScreen = ({ phase, dayKey, exerciseLogs, onFinish, onLogExercise, a
 
       {/* Weight */}
       <div style={{ marginBottom:12 }}>
-        <div style={{ fontSize:12, color:"#666", marginBottom:8, textTransform:"uppercase", letterSpacing:"0.08em" }}>Weight (lbs)</div>
+        {(() => {
+          const isDB = /\bDB\b|Dumbbell|dumbbell/i.test(ex.name);
+          return (
+            <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
+              <div style={{ fontSize:12, color:"#666", textTransform:"uppercase", letterSpacing:"0.08em" }}>
+                Weight (lbs)
+              </div>
+              {isDB && (
+                <div style={{
+                  fontSize:10, fontWeight:700, color:"#f59e0b",
+                  background:"rgba(245,158,11,0.12)", border:"1px solid rgba(245,158,11,0.3)",
+                  borderRadius:6, padding:"2px 7px", letterSpacing:"0.05em",
+                }}>
+                  EACH HAND
+                </div>
+              )}
+            </div>
+          );
+        })()}
         <div style={S.stepper}>
           <button style={S.stepBtn(accentColor)} onClick={() => setWeights({...weights,[ex.name]:Math.max(0,w-5)})}>
             <Icon name="minus" size={20} color={accentColor}/>
           </button>
-          <div style={S.stepVal}>{w}</div>
+          <div style={{ ...S.stepVal, display:"flex", flexDirection:"column", alignItems:"center", gap:2 }}>
+            <span>{w}</span>
+            {/\bDB\b|Dumbbell|dumbbell/i.test(ex.name) && (
+              <span style={{ fontSize:10, color:"#f59e0b", fontWeight:700 }}>×2 = {w*2} total</span>
+            )}
+          </div>
           <button style={S.stepBtn(accentColor)} onClick={() => setWeights({...weights,[ex.name]:w+5})}>
             <Icon name="plus" size={20} color={accentColor}/>
           </button>
@@ -1910,6 +2140,7 @@ export default function App() {
   const [isWorkingOut, setIsWorkingOut] = useState(false);
   const [cloudLoading, setCloudLoading] = useState(false);
   const [savedWorkoutState, setSavedWorkoutState] = useState(null); // persists workout across nav
+  const [selectedDayKey, setSelectedDayKey] = useState(null); // user-chosen workout override
 
   // ── Guest-mode local state (always available) ─────────────────────────────
   const [guestProfile, setGuestProfile] = useState(() => getStore("user", {
@@ -2070,6 +2301,15 @@ export default function App() {
     }
   };
 
+  const handleSetPhase = async (newPhaseIdx) => {
+    if (authUser) {
+      await supabase.from("profiles").update({ phase_override: newPhaseIdx }).eq("id", authUser.id);
+      setCloudProfile(p => ({ ...p, phase_override: newPhaseIdx }));
+    } else {
+      setGuestProfile(p => ({ ...p, phase_override: newPhaseIdx }));
+    }
+  };
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
   };
@@ -2079,7 +2319,8 @@ export default function App() {
   };
 
   // ── Derived state ─────────────────────────────────────────────────────────
-  const { phase, dayKey, phaseDay, workoutsInPhase } = getPhaseAndDay(workoutCount, exerciseLogs);
+  const phaseOverride = profile?.phase_override ?? null;
+  const { phase, dayKey, phaseDay, workoutsInPhase, phaseIndex } = getPhaseAndDay(workoutCount, exerciseLogs, phaseOverride);
   const accentColor = phase.color;
   const user = profile || { name: "Athlete", current_weight: null, start_date: new Date().toISOString() };
 
@@ -2105,7 +2346,7 @@ export default function App() {
       return (
         <WorkoutScreen
           phase={phase}
-          dayKey={dayKey}
+          dayKey={selectedDayKey || dayKey}
           exerciseLogs={exerciseLogs}
           onFinish={handleWorkoutFinish}
           onLogExercise={handleLogExercise}
@@ -2127,7 +2368,9 @@ export default function App() {
             phaseDay={phaseDay}
             workoutCount={workoutCount}
             workoutsInPhase={workoutsInPhase}
-            onStartWorkout={() => { setIsWorkingOut(true); setTab("workout"); }}
+            onStartWorkout={(chosenDay) => { setSelectedDayKey(chosenDay || dayKey); setSavedWorkoutState(null); setIsWorkingOut(true); setTab("workout"); }}
+            onSetPhase={handleSetPhase}
+            phaseIndex={phaseIndex}
             accentColor={accentColor}
           />
         );
