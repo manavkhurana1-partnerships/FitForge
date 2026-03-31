@@ -600,7 +600,7 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
             {PHASES.map((p, i) => (
               <button key={p.id} onClick={() => {
                 if (i === phaseIndex) return;
-                if (window.confirm(\`Switch to \${p.name}? Your day counter will reset.\`)) {
+                if (window.confirm(`Switch to ${p.name}? Your day counter will reset.`)) {
                   onSetPhase(i);
                 }
               }} style={{
