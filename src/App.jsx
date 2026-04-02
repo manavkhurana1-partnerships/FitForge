@@ -1153,7 +1153,7 @@ const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
       try {
         const BASE = "https://wger.de";
 
-        // Step 1: search by name
+        // Step 1: search by name — returns both translation id and base_id
         const searchRes = await fetch(
           `${BASE}/api/v2/exercise/search/?term=${encodeURIComponent(exerciseName)}&language=english&format=json`
         );
@@ -1161,25 +1161,39 @@ const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
         const suggestions = searchData?.suggestions || [];
         if (!suggestions.length) throw new Error("not found");
 
-        const exId = suggestions[0]?.data?.id;
-        if (!exId) throw new Error("no id");
+        // base_id is what exerciseinfo and exerciseimage endpoints need
+        const baseId = suggestions[0]?.data?.base_id || suggestions[0]?.data?.id;
+        if (!baseId) throw new Error("no id");
 
-        // Step 2: get full exercise info
-        const infoRes = await fetch(`${BASE}/api/v2/exerciseinfo/${exId}/?format=json`);
+        // Step 2: get full exercise info using base_id
+        const infoRes = await fetch(`${BASE}/api/v2/exerciseinfo/${baseId}/?format=json`);
         const info = await infoRes.json();
 
         // English description — strip HTML
         const engTranslation = (info.translations || []).find(t => t.language === 2);
         const desc = (engTranslation?.description || "").replace(/<[^>]+>/g, "").trim();
 
-        // Images — prepend base URL if relative
-        const images = (info.images || [])
+        // Images — exerciseinfo returns full URLs; also try exerciseimage endpoint as fallback
+        let images = (info.images || [])
           .map(img => {
             const src = img.image || "";
             return src.startsWith("http") ? src : `${BASE}${src}`;
           })
           .filter(Boolean)
           .slice(0, 2);
+
+        // Fallback: fetch images directly if exerciseinfo had none
+        if (!images.length) {
+          const imgRes = await fetch(`${BASE}/api/v2/exerciseimage/?exercise_base=${baseId}&format=json`);
+          const imgData = await imgRes.json();
+          images = (imgData.results || [])
+            .map(img => {
+              const src = img.image || "";
+              return src.startsWith("http") ? src : `${BASE}${src}`;
+            })
+            .filter(Boolean)
+            .slice(0, 2);
+        }
 
         // Muscles
         const muscles = [
