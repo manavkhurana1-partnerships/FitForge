@@ -595,7 +595,7 @@ const S = {
 };
 
 // ─── HOME SCREEN ──────────────────────────────────────────────────────────────
-const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, workoutCount, workoutsInPhase, onStartWorkout, onSetPhase, phaseIndex, accentColor, planDays, onEditPrefs }) => {
+const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, workoutCount, workoutsInPhase, onStartWorkout, onSetPhase, phaseIndex, accentColor, planDays, onEditPrefs, phases }) => {
   const [activeDayKey, setActiveDayKey] = useState(dayKey);
   const allWorkouts = planDays || [];
   const workout = allWorkouts.find(d => d.key === activeDayKey) || allWorkouts[0] || { name: "Workout", icon: "⚡", exercises: [], cardio: { hasCardio: false } };
@@ -648,7 +648,7 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
           </div>
           {/* Phase switcher pills */}
           <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
-            {PHASES.map((p, i) => (
+            {(phases || PHASES_DEFAULT).map((p, i) => (
               <button key={p.id} onClick={() => {
                 if (i === phaseIndex) return;
                 if (window.confirm(`Switch to ${p.name}? Your day counter will reset.`)) {
@@ -1151,44 +1151,43 @@ const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
 
     const fetchInfo = async () => {
       try {
-        // Step 1: search wger.de for the exercise by name
+        const BASE = "https://wger.de";
+
+        // Step 1: search by name
         const searchRes = await fetch(
-          `https://wger.de/api/v2/exercise/search/?term=${encodeURIComponent(exerciseName)}&language=english&format=json`,
-          { headers: { 'Accept': 'application/json' } }
+          `${BASE}/api/v2/exercise/search/?term=${encodeURIComponent(exerciseName)}&language=english&format=json`
         );
         const searchData = await searchRes.json();
         const suggestions = searchData?.suggestions || [];
         if (!suggestions.length) throw new Error("not found");
 
-        // Step 2: get full exercise info by ID
         const exId = suggestions[0]?.data?.id;
         if (!exId) throw new Error("no id");
 
-        const infoRes = await fetch(
-          `https://wger.de/api/v2/exerciseinfo/${exId}/?format=json`,
-          { headers: { 'Accept': 'application/json' } }
-        );
+        // Step 2: get full exercise info
+        const infoRes = await fetch(`${BASE}/api/v2/exerciseinfo/${exId}/?format=json`);
         const info = await infoRes.json();
 
-        // Extract English description
-        const engTranslation = info.translations?.find(t => t.language === 2);
-        const rawDesc = engTranslation?.description || "";
-        // Strip HTML tags
-        const desc = rawDesc.replace(/<[^>]+>/g, "").trim();
+        // English description — strip HTML
+        const engTranslation = (info.translations || []).find(t => t.language === 2);
+        const desc = (engTranslation?.description || "").replace(/<[^>]+>/g, "").trim();
 
-        // Images
-        const images = (info.images || []).map(img => img.image).filter(Boolean);
+        // Images — prepend base URL if relative
+        const images = (info.images || [])
+          .map(img => {
+            const src = img.image || "";
+            return src.startsWith("http") ? src : `${BASE}${src}`;
+          })
+          .filter(Boolean)
+          .slice(0, 2);
 
-        // Primary muscles
+        // Muscles
         const muscles = [
           ...(info.muscles || []).map(m => m.name_en || m.name),
           ...(info.muscles_secondary || []).map(m => `${m.name_en || m.name} (secondary)`),
         ];
 
-        // Category
-        const category = info.category?.name || "";
-
-        setData({ desc, images, muscles, category });
+        setData({ desc, images, muscles });
       } catch (e) {
         setError(true);
       } finally {
@@ -1256,21 +1255,13 @@ const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
             <>
               {/* Image */}
               {data.images.length > 0 ? (
-                <div style={{ marginBottom: 20, borderRadius: 16, overflow: "hidden", background: "#fff", display: "flex", justifyContent: "center" }}>
-                  <img
-                    src={data.images[0]}
-                    alt={exerciseName}
-                    style={{ width: "100%", maxHeight: 260, objectFit: "contain", display: "block" }}
-                    onError={e => { e.target.style.display = "none"; }}
-                  />
-                  {data.images.length > 1 && (
-                    <img
-                      src={data.images[1]}
-                      alt={exerciseName}
-                      style={{ width: "50%", maxHeight: 260, objectFit: "contain", display: "block" }}
-                      onError={e => { e.target.style.display = "none"; }}
+                <div style={{ marginBottom: 20, borderRadius: 16, overflow: "hidden", background: "#1a1a2e", display: "flex", gap: 2 }}>
+                  {data.images.map((src, i) => (
+                    <img key={i} src={src} alt={`${exerciseName} ${i+1}`}
+                      style={{ flex: 1, width: 0, maxHeight: 240, objectFit: "cover", display: "block" }}
+                      onError={e => { e.target.parentNode.style.display = "none"; }}
                     />
-                  )}
+                  ))}
                 </div>
               ) : (
                 <div style={{ marginBottom: 20, borderRadius: 16, background: `${accentColor}11`, border: `1px solid ${accentColor}22`, padding: "32px 20px", textAlign: "center" }}>
@@ -1869,7 +1860,7 @@ const HistoryScreen = ({ exerciseLogs, accentColor }) => {
 };
 
 // ─── PROFILE SCREEN ───────────────────────────────────────────────────────────
-const ProfileScreen = ({ user, phase, authUser, cloudLoading, onReset, onSaveName, onSignOut, onAuth, accentColor }) => {
+const ProfileScreen = ({ user, phase, authUser, cloudLoading, onReset, onSaveName, onSignOut, onAuth, accentColor, phases }) => {
   const [name, setName] = useState(user.name);
   const [saved, setSaved] = useState(false);
   const startDate = new Date(user.start_date);
@@ -1957,8 +1948,8 @@ const ProfileScreen = ({ user, phase, authUser, cloudLoading, onReset, onSaveNam
       {/* Phase roadmap */}
       <div style={{ ...S.card(), marginBottom: 12 }}>
         <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, color: "#ccc" }}>Training Phases</div>
-        {PHASES.map((p, i) => (
-          <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: i < PHASES.length - 1 ? 14 : 0 }}>
+        {(phases || PHASES_DEFAULT).map((p, i) => (
+          <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: i < (phases || PHASES_DEFAULT).length - 1 ? 14 : 0 }}>
             <div style={{ width: 10, height: 10, borderRadius: "50%", background: p.id === phase.id ? p.color : "#333", flexShrink: 0, boxShadow: p.id === phase.id ? `0 0 10px ${p.color}` : "none" }} />
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: p.id === phase.id ? p.color : "#888" }}>{p.name} {p.id === phase.id ? "← Active" : ""}</div>
@@ -2728,6 +2719,7 @@ export default function App() {
             accentColor={accentColor}
             planDays={planDays}
             onEditPrefs={() => setShowOnboarding(true)}
+            phases={genderPalette}
           />
         );
       case "weight":
@@ -2746,6 +2738,7 @@ export default function App() {
             onSignOut={handleSignOut}
             onAuth={handleAuth}
             accentColor={accentColor}
+            phases={genderPalette}
           />
         );
       default:
