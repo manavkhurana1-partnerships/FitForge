@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "./supabase";
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
@@ -13,6 +13,7 @@ const PHASES_FEMALE = [
   { id: 3, name: "Power",       icon: "⚡", color: "#fb923c", desc: "Explosive, 3-5 reps",       weeks: 4 },
 ];
 const PHASES = PHASES_MALE; // default — overridden at runtime by gender pref
+const WORKOUT_DAYS = ["A", "B", "C", "D", "E"]; // supports up to 5-day splits
 
 
 // ─── ONBOARDING CONFIG ────────────────────────────────────────────────────────
