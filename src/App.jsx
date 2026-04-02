@@ -1226,8 +1226,9 @@ const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
         width: "100%", maxWidth: 430, background: "#13131a",
         borderRadius: "24px 24px 0 0", border: "1px solid rgba(255,255,255,0.1)",
         borderBottom: "none", zIndex: 501,
-        maxHeight: "82vh", overflowY: "auto",
+        height: "85vh", overflowY: "scroll",
         WebkitOverflowScrolling: "touch",
+        touchAction: "pan-y",
       }}>
         {/* Handle */}
         <div style={{ display: "flex", justifyContent: "center", padding: "14px 0 0" }}>
