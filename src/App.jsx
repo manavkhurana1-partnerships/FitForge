@@ -1153,7 +1153,7 @@ const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
       try {
         const BASE = "https://wger.de";
 
-        // Step 1: search by name — returns both translation id and base_id
+        // Step 1: search by name
         const searchRes = await fetch(
           `${BASE}/api/v2/exercise/search/?term=${encodeURIComponent(exerciseName)}&language=english&format=json`
         );
@@ -1161,11 +1161,16 @@ const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
         const suggestions = searchData?.suggestions || [];
         if (!suggestions.length) throw new Error("not found");
 
-        // base_id is what exerciseinfo and exerciseimage endpoints need
-        const baseId = suggestions[0]?.data?.base_id || suggestions[0]?.data?.id;
+        // Find the best match — suggestion value should closely match exercise name
+        const normalize = s => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+        const target = normalize(exerciseName);
+        const match = suggestions.find(s => normalize(s.value || "").includes(target) || target.includes(normalize(s.value || "")))
+          || suggestions[0];
+
+        const baseId = match?.data?.base_id || match?.data?.id;
         if (!baseId) throw new Error("no id");
 
-        // Step 2: get full exercise info using base_id
+        // Step 2: get full exercise info
         const infoRes = await fetch(`${BASE}/api/v2/exerciseinfo/${baseId}/?format=json`);
         const info = await infoRes.json();
 
@@ -1173,8 +1178,10 @@ const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
         const engTranslation = (info.translations || []).find(t => t.language === 2);
         const desc = (engTranslation?.description || "").replace(/<[^>]+>/g, "").trim();
 
-        // Images — exerciseinfo returns full URLs; also try exerciseimage endpoint as fallback
-        let images = (info.images || [])
+        // Images from exerciseimage endpoint (most reliable)
+        const imgRes = await fetch(`${BASE}/api/v2/exerciseimage/?exercise_base=${baseId}&is_main=True&format=json`);
+        const imgData = await imgRes.json();
+        let images = (imgData.results || [])
           .map(img => {
             const src = img.image || "";
             return src.startsWith("http") ? src : `${BASE}${src}`;
@@ -1182,11 +1189,9 @@ const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
           .filter(Boolean)
           .slice(0, 2);
 
-        // Fallback: fetch images directly if exerciseinfo had none
+        // Fallback to exerciseinfo images if exerciseimage returned nothing
         if (!images.length) {
-          const imgRes = await fetch(`${BASE}/api/v2/exerciseimage/?exercise_base=${baseId}&format=json`);
-          const imgData = await imgRes.json();
-          images = (imgData.results || [])
+          images = (info.images || [])
             .map(img => {
               const src = img.image || "";
               return src.startsWith("http") ? src : `${BASE}${src}`;
@@ -1279,9 +1284,8 @@ const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
                   ))}
                 </div>
               ) : (
-                <div style={{ marginBottom: 20, borderRadius: 16, background: `${accentColor}11`, border: `1px solid ${accentColor}22`, padding: "32px 20px", textAlign: "center" }}>
-                  <div style={{ fontSize: 48, marginBottom: 8 }}>🏋️</div>
-                  <div style={{ fontSize: 13, color: "#666" }}>No image available</div>
+                <div style={{ marginBottom: 20, borderRadius: 16, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", padding: "28px 20px", textAlign: "center" }}>
+                  <div style={{ fontSize: 13, color: "#555" }}>No image available for this exercise</div>
                 </div>
               )}
 
