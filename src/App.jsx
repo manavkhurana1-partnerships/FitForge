@@ -3,6 +3,11 @@ import { supabase } from "./supabase";
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 const PHASES_MALE = [
+  { id: 1, name: "Hypertrophy", icon: "💪", color: "#3b82f6", desc: "Volume-focused, 8-12 reps", weeks: 4 },
+  { id: 2, name: "Strength",    icon: "🏋️", color: "#60a5fa", desc: "Heavy loads, 4-6 reps",    weeks: 4 },
+  { id: 3, name: "Power",       icon: "⚡", color: "#93c5fd", desc: "Explosive, 3-5 reps",       weeks: 4 },
+];
+const PHASES_DEFAULT = [
   { id: 1, name: "Hypertrophy", icon: "💪", color: "#00ff88", desc: "Volume-focused, 8-12 reps", weeks: 4 },
   { id: 2, name: "Strength",    icon: "🏋️", color: "#00cfff", desc: "Heavy loads, 4-6 reps",    weeks: 4 },
   { id: 3, name: "Power",       icon: "⚡", color: "#ff6b35", desc: "Explosive, 3-5 reps",       weeks: 4 },
@@ -12,7 +17,7 @@ const PHASES_FEMALE = [
   { id: 2, name: "Strength",    icon: "🏋️", color: "#f472b6", desc: "Heavy loads, 4-6 reps",    weeks: 4 },
   { id: 3, name: "Power",       icon: "⚡", color: "#fb923c", desc: "Explosive, 3-5 reps",       weeks: 4 },
 ];
-const PHASES = PHASES_MALE; // default — overridden at runtime by gender pref
+const PHASES = PHASES_DEFAULT; // default palette (used for phase switcher labels in HomeScreen/ProfileScreen)
 const WORKOUT_DAYS = ["A", "B", "C", "D", "E"]; // supports up to 5-day splits
 
 
@@ -312,8 +317,8 @@ const getPhaseAndDay = (workoutCount, exerciseLogs, phaseOverride, palette) => {
   const WORKOUTS_PER_PHASE = 12;
   // phaseOverride lets user manually jump to a phase; it resets the day counter
   const phaseIndex = phaseOverride != null
-    ? phaseOverride % PHASES.length
-    : Math.floor(count / WORKOUTS_PER_PHASE) % PHASES.length;
+    ? phaseOverride % (palette || PHASES_MALE).length
+    : Math.floor(count / WORKOUTS_PER_PHASE) % (palette || PHASES_MALE).length;
   const dayIndex = count % 3;
   const workoutsInPhase = phaseOverride != null ? 0 : count % WORKOUTS_PER_PHASE;
 
@@ -1999,48 +2004,37 @@ const OnboardingScreen = ({ onComplete, accentColor }) => {
           <div style={{ fontSize: 14, color: "#666", marginBottom: 28 }}>{steps[step].subtitle}</div>
 
           {/* STEP 0 — Gender */}
-          {step === 0 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {[
-                { id: "male",   label: "Male",   icon: "♂",  desc: "Bold greens and blues" },
-                { id: "female", label: "Female", icon: "♀",  desc: "Pinks and purples" },
-                { id: "other",  label: "Prefer not to say", icon: "✦", desc: "Default color theme" },
-              ].map(g => (
-                <button key={g.id} onClick={() => setGender(g.id)} style={{
-                  background: gender === g.id
-                    ? g.id === "female" ? "rgba(232,121,249,0.12)" : "rgba(0,255,136,0.12)"
-                    : "rgba(255,255,255,0.04)",
-                  border: `2px solid ${gender === g.id
-                    ? g.id === "female" ? "#e879f9" : "#00ff88"
-                    : "rgba(255,255,255,0.09)"}`,
-                  borderRadius: 18, padding: "20px 22px", cursor: "pointer",
-                  display: "flex", alignItems: "center", gap: 18, textAlign: "left",
-                  transition: "all 0.2s",
-                }}>
-                  <span style={{
-                    fontSize: 36, width: 52, height: 52, borderRadius: "50%",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    background: gender === g.id
-                      ? g.id === "female" ? "rgba(232,121,249,0.2)" : "rgba(0,255,136,0.2)"
-                      : "rgba(255,255,255,0.07)",
-                    flexShrink: 0,
-                  }}>{g.icon}</span>
-                  <div style={{ flex: 1 }}>
-                    <div style={{
-                      fontSize: 17, fontWeight: 800,
-                      color: gender === g.id
-                        ? g.id === "female" ? "#e879f9" : "#00ff88"
-                        : "#fff",
-                    }}>{g.label}</div>
-                    <div style={{ fontSize: 12, color: "#666", marginTop: 3 }}>{g.desc}</div>
-                  </div>
-                  {gender === g.id && (
-                    <div style={{ color: g.id === "female" ? "#e879f9" : "#00ff88", fontSize: 20, fontWeight: 700 }}>✓</div>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
+          {step === 0 && (() => {
+            const opts = [
+              { id: "male",   label: "Male",   icon: "♂",  sel: "rgba(59,130,246,0.15)",  border: "#3b82f6" },
+              { id: "female", label: "Female", icon: "♀",  sel: "rgba(232,121,249,0.15)", border: "#e879f9" },
+              { id: "other",  label: "Prefer not to say", icon: "✦", sel: "rgba(0,255,136,0.12)", border: "#00ff88" },
+            ];
+            return (
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                {opts.map(g => (
+                  <button key={g.id} onClick={() => setGender(g.id)} style={{
+                    background: gender === g.id ? g.sel : "rgba(255,255,255,0.04)",
+                    border: `2px solid ${gender === g.id ? g.border : "rgba(255,255,255,0.09)"}`,
+                    borderRadius: 18, padding: "20px 22px", cursor: "pointer",
+                    display: "flex", alignItems: "center", gap: 18, textAlign: "left",
+                    transition: "all 0.2s",
+                  }}>
+                    <span style={{
+                      fontSize: 32, width: 52, height: 52, borderRadius: "50%",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      background: gender === g.id ? g.sel : "rgba(255,255,255,0.07)",
+                      flexShrink: 0,
+                    }}>{g.icon}</span>
+                    <div style={{ fontSize: 17, fontWeight: 800, color: gender === g.id ? g.border : "#fff" }}>
+                      {g.label}
+                    </div>
+                    {gender === g.id && <div style={{ marginLeft: "auto", color: g.border, fontSize: 20 }}>✓</div>}
+                  </button>
+                ))}
+              </div>
+            );
+          })()}
 
           {/* STEP 1 — Goal */}
           {step === 1 && (
@@ -2149,6 +2143,19 @@ const OnboardingScreen = ({ onComplete, accentColor }) => {
 
       {/* Bottom nav */}
       <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, padding: "16px 20px 36px", background: "linear-gradient(transparent, #0a0a0f 40%)" }}>
+        {/* Skip setup */}
+        <button onClick={() => onComplete({
+          gender: "other", goal: "general_fitness",
+          equipment: ["bodyweight"], frequency: 3,
+          name: "Athlete", skipped: true,
+        })} style={{
+          width: "100%", padding: "10px", marginBottom: 10,
+          background: "transparent", border: "none",
+          color: "#444", fontSize: 13, cursor: "pointer",
+          textDecoration: "underline", textDecorationColor: "#333",
+        }}>
+          Skip setup — use defaults
+        </button>
         <div style={{ display: "flex", gap: 10 }}>
           {step > 0 && (
             <button onClick={() => goTo(step - 1)} style={{
@@ -2504,10 +2511,12 @@ export default function App() {
   };
 
   // ── Derived state ─────────────────────────────────────────────────────────
-  const gender = profile?.gender || "male";
-  const activePhasePalette = gender === "female" ? PHASES_FEMALE : PHASES_MALE;
+  const gender = profile?.gender || "other";
+  const genderPalette = gender === "female" ? PHASES_FEMALE
+    : gender === "male" ? PHASES_MALE
+    : PHASES_DEFAULT; // "other" uses green (default)
   const phaseOverride = profile?.phase_override ?? null;
-  const { phase, dayKey, phaseDay, workoutsInPhase, phaseIndex } = getPhaseAndDay(workoutCount, exerciseLogs, phaseOverride, activePhasePalette);
+  const { phase, dayKey, phaseDay, workoutsInPhase, phaseIndex } = getPhaseAndDay(workoutCount, exerciseLogs, phaseOverride, genderPalette);
   const accentColor = phase.color;
   const user = profile || { name: "Athlete", current_weight: null, start_date: new Date().toISOString() };
 
