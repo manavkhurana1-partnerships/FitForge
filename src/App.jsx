@@ -1504,11 +1504,34 @@ const WorkoutScreen = ({ phase, dayKey, workoutDay, exerciseLogs, onSave, onFini
       {/* Header */}
       <div style={{ padding:"56px 4px 16px" }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-            <div style={{ fontSize:12, color:"#666", textTransform:"uppercase", letterSpacing:"0.08em" }}>{workout.name}</div>
-  
-          </div>
+          <div style={{ fontSize:12, color:"#666", textTransform:"uppercase", letterSpacing:"0.08em" }}>{workout.name}</div>
           <div style={{ fontSize:12, color:"#666" }}>{currentExIdx + 1} / {exercises.length}</div>
+        </div>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginTop:8, gap:10 }}>
+          <div style={{ flex:1 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+              <div style={{ fontSize:22, fontWeight:800, lineHeight:1.2 }}>{ex.name}</div>
+              <button onClick={() => setShowInfoFor(ex.name)} style={{
+                background:"rgba(255,255,255,0.08)", border:"1px solid rgba(255,255,255,0.14)",
+                borderRadius:"50%", width:24, height:24, display:"flex", alignItems:"center",
+                justifyContent:"center", cursor:"pointer", color:"#888", fontSize:13,
+                fontWeight:700, flexShrink:0, lineHeight:1,
+              }}>?</button>
+            </div>
+            {ex.swappedFrom && <div style={{ fontSize:11, color:"#888", marginTop:4 }}>↔ Swapped from {ex.swappedFrom}</div>}
+          </div>
+          {completedForCurrent === 0 && (
+            <button onClick={handleSwap} style={{
+              display:"flex", alignItems:"center", gap:6,
+              background: ex.swappedFrom ? "rgba(255,107,53,0.15)" : "rgba(255,255,255,0.07)",
+              border:`1px solid ${ex.swappedFrom ? "rgba(255,107,53,0.4)" : "rgba(255,255,255,0.12)"}`,
+              borderRadius:10, padding:"7px 12px", cursor:"pointer", flexShrink:0,
+              color: ex.swappedFrom ? "#ff6b35" : "#aaa", fontSize:12, fontWeight:700,
+            }}>
+              <Icon name="swap" size={14} color={ex.swappedFrom ? "#ff6b35" : "#aaa"} />
+              {ex.swappedFrom ? "Swap Again" : "Swap"}
+            </button>
+          )}
         </div>
 
         {/* Exercise progress dots */}
@@ -1678,6 +1701,99 @@ const WorkoutScreen = ({ phase, dayKey, workoutDay, exerciseLogs, onSave, onFini
 };
 
 // ─── HISTORY SCREEN ───────────────────────────────────────────────────────────
+// ─── WEIGHT LOG SCREEN ────────────────────────────────────────────────────────
+const WeightScreen = ({ weightLogs, onLog, accentColor }) => {
+  const [inputVal, setInputVal] = useState("");
+  const [logged, setLogged] = useState(false);
+  const chartData = weightLogs.slice(-12).map(l => ({
+    value: l.weight_value,
+    label: new Date(l.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+  }));
+  const latest = weightLogs.length ? weightLogs[weightLogs.length - 1] : null;
+  const prev = weightLogs.length > 1 ? weightLogs[weightLogs.length - 2] : null;
+  const diff = latest && prev ? (latest.weight_value - prev.weight_value).toFixed(1) : null;
+
+  const handleLog = async () => {
+    const val = parseFloat(inputVal);
+    if (!val || val <= 0) return;
+    await onLog(val);
+    setLogged(true);
+    setInputVal("");
+    setTimeout(() => setLogged(false), 2000);
+  };
+
+  return (
+    <div style={{ ...S.scroll, padding: "60px 16px 20px" }}>
+      <div style={{ fontSize: 13, color: "#666", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Track</div>
+      <div style={{ fontSize: 26, fontWeight: 900, marginBottom: 24 }}>Body Weight</div>
+
+      {/* Log weight */}
+      <div style={{ ...S.card(), marginBottom: 12 }}>
+        <div style={{ fontSize: 12, color: "#666", marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.08em" }}>Log Today's Weight</div>
+        <div style={{ display: "flex", gap: 10 }}>
+          <input
+            type="number" inputMode="decimal"
+            placeholder="lbs"
+            value={inputVal}
+            onChange={e => setInputVal(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && handleLog()}
+            style={{
+              flex: 1, background: "rgba(255,255,255,0.07)",
+              border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12,
+              color: "#fff", fontSize: 20, fontWeight: 700,
+              padding: "14px 16px", outline: "none",
+            }}
+          />
+          <button
+            onClick={handleLog}
+            style={{
+              ...S.bigBtn(logged ? "#1a3a2a" : accentColor),
+              flex: 0, padding: "14px 20px", fontSize: 14,
+              color: logged ? "#00ff88" : "#000",
+            }}
+          >
+            {logged ? "✓" : "Log"}
+          </button>
+        </div>
+      </div>
+
+      {/* Latest stats */}
+      {latest && (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 12 }}>
+          <div style={{ ...S.card(), marginBottom: 0, textAlign: "center" }}>
+            <div style={{ fontSize: 11, color: "#666", textTransform: "uppercase", letterSpacing: "0.08em" }}>Current</div>
+            <div style={{ fontSize: 28, fontWeight: 900, color: accentColor, marginTop: 4 }}>
+              {latest.weight_value}<span style={{ fontSize: 14, color: "#555", fontWeight: 400 }}> lbs</span>
+            </div>
+          </div>
+          <div style={{ ...S.card(), marginBottom: 0, textAlign: "center" }}>
+            <div style={{ fontSize: 11, color: "#666", textTransform: "uppercase", letterSpacing: "0.08em" }}>Change</div>
+            <div style={{ fontSize: 28, fontWeight: 900, marginTop: 4, color: diff > 0 ? "#ff6b35" : diff < 0 ? accentColor : "#888" }}>
+              {diff !== null ? (diff > 0 ? `+${diff}` : diff) : "—"}<span style={{ fontSize: 14, color: "#555", fontWeight: 400 }}> lbs</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Chart */}
+      {chartData.length >= 2 ? (
+        <div style={{ ...S.card(), marginBottom: 0 }}>
+          <div style={{ fontSize: 12, color: "#666", marginBottom: 12, textTransform: "uppercase", letterSpacing: "0.08em" }}>Last {chartData.length} entries</div>
+          <LineChart data={chartData} color={accentColor} height={140} />
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
+            <div style={{ fontSize: 10, color: "#555" }}>{chartData[0]?.label}</div>
+            <div style={{ fontSize: 10, color: "#555" }}>{chartData[chartData.length - 1]?.label}</div>
+          </div>
+        </div>
+      ) : (
+        <div style={{ ...S.card(), textAlign: "center", color: "#555", fontSize: 13 }}>
+          Log at least 2 entries to see your trend chart.
+        </div>
+      )}
+    </div>
+  );
+};
+
 const HistoryScreen = ({ exerciseLogs, accentColor }) => {
   const [selectedExercise, setSelectedExercise] = useState(null);
 
@@ -1704,7 +1820,7 @@ const HistoryScreen = ({ exerciseLogs, accentColor }) => {
   }
 
   return (
-    <div style={{ ...S.scroll, padding: "60px 16px 40px", overflowY: "auto", height: "100vh", boxSizing: "border-box" }}>
+    <div style={{ ...S.scroll, padding: "60px 16px 120px", overflowY: "auto", height: "100vh", boxSizing: "border-box" }}>
       <div style={{ fontSize: 13, color: "#666", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Your</div>
       <div style={{ fontSize: 26, fontWeight: 900, marginBottom: 6 }}>Exercise History</div>
       <div style={{ fontSize: 13, color: "#666", marginBottom: 24 }}>Tap any exercise to see your progress chart.</div>
@@ -1807,7 +1923,7 @@ const ProfileScreen = ({ user, phase, authUser, cloudLoading, onReset, onSaveNam
   };
 
   return (
-    <div style={{ ...S.scroll, padding: "60px 16px 40px", overflowY: "auto", height: "100vh", boxSizing: "border-box" }}>
+    <div style={{ ...S.scroll, padding: "60px 16px 120px", overflowY: "auto", height: "100vh", boxSizing: "border-box" }}>
       <div style={{ fontSize: 13, color: "#666", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Your</div>
       <div style={{ fontSize: 26, fontWeight: 900, marginBottom: 24 }}>Profile</div>
 
@@ -1851,6 +1967,13 @@ const ProfileScreen = ({ user, phase, authUser, cloudLoading, onReset, onSaveNam
           </div>
         ))}
       </div>
+
+      <button
+        style={{ ...S.bigBtn("#444"), color: "#ff6b35", boxShadow: "none", marginBottom: 12 }}
+        onClick={() => { if (window.confirm("Reset all data? This cannot be undone.")) onReset(); }}
+      >
+        Reset All Data
+      </button>
 
       {/* ── Cloud Sync Section ─────────────────────────────────────────────── */}
       {authUser ? (
@@ -1919,12 +2042,7 @@ const ProfileScreen = ({ user, phase, authUser, cloudLoading, onReset, onSaveNam
         </div>
       )}
 
-      <button
-        style={{ ...S.bigBtn("#444"), color: "#ff6b35", boxShadow: "none" }}
-        onClick={() => { if (window.confirm("Reset all data? This cannot be undone.")) onReset(); }}
-      >
-        Reset All Data
-      </button>
+
     </div>
   );
 };
