@@ -191,51 +191,49 @@ const generateWorkoutPlan = (prefs) => {
   };
   const cardio = cardioByGoal[goal] || cardioByGoal.general_fitness;
 
-  // Priority exercise pools per split — preference order, filtered by equipment
-  const pools = {
-    push: [
-      "Bench Press","Overhead Press","Squat","Push Press",
-      "Incline DB Press","DB Flat Press","DB Shoulder Press","Arnold Press",
-      "Machine Chest Press","Lateral Raises","Cable Tricep Pushdown",
-      "Skull Crushers","Close-Grip Bench","Dips","Push-Ups",
-      "Overhead Tricep Extension","DB Kickback","Diamond Push-Ups","Floor Press",
-    ].filter(canDo),
-    pull: [
-      "Deadlift","Trap Bar Deadlift","Barbell Row","Pendlay Row","Power Clean",
-      "Pull-Ups","Weighted Pull-Ups","Lat Pulldown","Cable Row","DB Row",
-      "T-Bar Row","Chest-Supported Row","Inverted Row","Face Pulls",
-      "Barbell Curl","EZ Bar Curl","Hammer Curl","Cable Curl",
-      "Preacher Curl","Incline DB Curl","Concentration Curl",
-      "DB Shrug","Barbell Shrug","Trap Bar Shrug","Farmer Carry",
-    ].filter(canDo),
-    legs: [
-      "Squat","Box Squat","Leg Press","Bulgarian Split Squat","Goblet Squat",
-      "Romanian Deadlift","Hip Thrust","Walking Lunges","Step-Ups",
-      "Leg Curl","Leg Extension","Hack Squat","Stiff-Leg Deadlift",
-      "Glute Bridge","Sumo Deadlift","Nordic Curl",
-      "Calf Raises","Seated Calf Raise","Single-Leg Calf Raise","Donkey Calf Raise",
-      "Box Jump","Jump Squat","Broad Jump",
-    ].filter(canDo),
-    upper: [
-      "Bench Press","Overhead Press","Barbell Row","Pull-Ups","Weighted Pull-Ups",
-      "Incline DB Press","DB Shoulder Press","DB Row","Lat Pulldown","Cable Row",
-      "Lateral Raises","Face Pulls","Barbell Curl","Hammer Curl",
-      "Cable Tricep Pushdown","Skull Crushers","Push-Ups","Inverted Row",
-    ].filter(canDo),
-    lower: [
-      "Squat","Leg Press","Romanian Deadlift","Hip Thrust","Bulgarian Split Squat",
-      "Walking Lunges","Leg Curl","Leg Extension","Goblet Squat",
-      "Glute Bridge","Step-Ups","Stiff-Leg Deadlift","Nordic Curl",
-      "Calf Raises","Seated Calf Raise","Single-Leg Calf Raise",
-      "Box Jump","Jump Squat",
-    ].filter(canDo),
-    full: [
-      "Deadlift","Squat","Bench Press","Barbell Row","Overhead Press",
-      "Romanian Deadlift","Pull-Ups","Push-Ups","Goblet Squat","DB Row",
-      "Hip Thrust","Lateral Raises","Hammer Curl","Skull Crushers",
-      "Walking Lunges","Calf Raises","Kettlebell Swing","Medicine Ball Slam",
-    ].filter(canDo),
+  // Phase-specific exercise pools — each phase emphasises different movements
+  // hypertrophy: isolation-friendly, moderate compound
+  // strength: heavy barbell compounds first
+  // power: explosive/athletic movements first
+  const PHASE_POOLS = {
+    push: {
+      hypertrophy: ["Bench Press","Incline DB Press","DB Flat Press","DB Shoulder Press","Lateral Raises","Cable Tricep Pushdown","Overhead Tricep Extension","DB Kickback","Machine Chest Press","Dips","Push-Ups","Arnold Press","Floor Press","Close-Grip Push-Ups","Diamond Push-Ups"],
+      strength:    ["Bench Press","Overhead Press","Close-Grip Bench","Floor Press","Dips","Push Press","DB Shoulder Press","Skull Crushers","Incline DB Press","Lateral Raises","Cable Tricep Pushdown","Machine Chest Press","Arnold Press","DB Flat Press","Diamond Push-Ups"],
+      power:       ["Push Press","Bench Press","Floor Press","Dips","Close-Grip Bench","Overhead Press","Skull Crushers","DB Shoulder Press","Incline DB Press","Machine Chest Press","Lateral Raises","Arnold Press","Overhead Tricep Extension","DB Flat Press","Push-Ups"],
+    },
+    pull: {
+      hypertrophy: ["Lat Pulldown","Cable Row","DB Row","Barbell Row","Chest-Supported Row","Face Pulls","Incline DB Curl","Cable Curl","Concentration Curl","Barbell Curl","T-Bar Row","DB Shrug","Hammer Curl","Inverted Row","EZ Bar Curl","Preacher Curl"],
+      strength:    ["Deadlift","Weighted Pull-Ups","Pendlay Row","Barbell Row","Trap Bar Shrug","Hammer Curl","Pull-Ups","Barbell Curl","EZ Bar Curl","T-Bar Row","DB Row","Lat Pulldown","Face Pulls","Cable Row","Barbell Shrug","Preacher Curl"],
+      power:       ["Trap Bar Deadlift","Power Clean","Weighted Pull-Ups","Pull-Ups","Pendlay Row","Barbell Row","DB Snatch","Cable Row","Lat Pulldown","EZ Bar Curl","Barbell Curl","T-Bar Row","Face Pulls","DB Row","Hammer Curl","Barbell Shrug"],
+    },
+    legs: {
+      hypertrophy: ["Leg Press","Romanian Deadlift","Walking Lunges","Leg Extension","Leg Curl","Hip Thrust","Goblet Squat","Step-Ups","Glute Bridge","Single-Leg Calf Raise","Calf Raises","Bulgarian Split Squat","Seated Calf Raise","Nordic Curl","Donkey Calf Raise","Stiff-Leg Deadlift"],
+      strength:    ["Squat","Romanian Deadlift","Hip Thrust","Hack Squat","Leg Press","Bulgarian Split Squat","Sumo Deadlift","Stiff-Leg Deadlift","Nordic Curl","Standing Calf Raise","Leg Curl","Step-Ups","Leg Extension","Goblet Squat","Glute Bridge","Seated Calf Raise"],
+      power:       ["Box Squat","Jump Squat","Box Jump","Romanian Deadlift","Broad Jump","Bulgarian Split Squat","Leg Press","Hip Thrust","Leg Curl","Squat","Sumo Deadlift","Nordic Curl","Calf Raises","Hack Squat","Step-Ups","Goblet Squat"],
+    },
+    upper: {
+      hypertrophy: ["Bench Press","DB Row","Lat Pulldown","DB Shoulder Press","Incline DB Press","Cable Row","Lateral Raises","Face Pulls","Incline DB Curl","Cable Tricep Pushdown","Chest-Supported Row","Hammer Curl","Overhead Tricep Extension","Arnold Press","Push-Ups","Inverted Row"],
+      strength:    ["Bench Press","Weighted Pull-Ups","Overhead Press","Barbell Row","Close-Grip Bench","Pendlay Row","DB Shoulder Press","Skull Crushers","Pull-Ups","EZ Bar Curl","Lat Pulldown","Cable Row","Hammer Curl","Lateral Raises","Face Pulls","DB Row"],
+      power:       ["Push Press","Weighted Pull-Ups","Bench Press","Pendlay Row","Power Clean","Pull-Ups","DB Shoulder Press","EZ Bar Curl","Overhead Press","Barbell Row","DB Snatch","Lat Pulldown","Hammer Curl","Cable Row","Face Pulls","Cable Tricep Pushdown"],
+    },
+    lower: {
+      hypertrophy: ["Leg Press","Romanian Deadlift","Walking Lunges","Hip Thrust","Leg Extension","Leg Curl","Goblet Squat","Glute Bridge","Step-Ups","Single-Leg Calf Raise","Seated Calf Raise","Bulgarian Split Squat","Nordic Curl","Cable Kickback","Donkey Calf Raise","Stiff-Leg Deadlift"],
+      strength:    ["Squat","Romanian Deadlift","Hip Thrust","Leg Press","Hack Squat","Bulgarian Split Squat","Stiff-Leg Deadlift","Sumo Deadlift","Nordic Curl","Calf Raises","Leg Curl","Leg Extension","Goblet Squat","Step-Ups","Glute Bridge","Seated Calf Raise"],
+      power:       ["Box Squat","Jump Squat","Romanian Deadlift","Box Jump","Hip Thrust","Broad Jump","Bulgarian Split Squat","Leg Press","Sumo Deadlift","Nordic Curl","Hack Squat","Calf Raises","Leg Curl","Glute Bridge","Step-Ups","Goblet Squat"],
+    },
+    full: {
+      hypertrophy: ["Deadlift","Bench Press","Lat Pulldown","Goblet Squat","DB Row","Hip Thrust","DB Shoulder Press","Romanian Deadlift","Walking Lunges","Lateral Raises","Hammer Curl","Overhead Tricep Extension","Calf Raises","Face Pulls","Push-Ups","Glute Bridge"],
+      strength:    ["Deadlift","Squat","Bench Press","Weighted Pull-Ups","Overhead Press","Barbell Row","Romanian Deadlift","Close-Grip Bench","Hip Thrust","EZ Bar Curl","Skull Crushers","Pendlay Row","Calf Raises","Pull-Ups","Hack Squat","Hammer Curl"],
+      power:       ["Trap Bar Deadlift","Power Clean","Box Squat","Push Press","Weighted Pull-Ups","Box Jump","DB Snatch","Jump Squat","Bench Press","Broad Jump","Romanian Deadlift","Barbell Row","Medicine Ball Slam","Kettlebell Swing","Calf Raises","Pull-Ups"],
+    },
   };
+
+  const pools = Object.fromEntries(
+    Object.entries(PHASE_POOLS).map(([key, byPhase]) => [
+      key,
+      (byPhase[phaseKey] || byPhase.hypertrophy).filter(canDo),
+    ])
+  );
 
   const pick = (pool, n) => {
     const seen = new Set();
@@ -1140,58 +1138,83 @@ const CelebrationScreen = ({ celebration, accentColor, onDone }) => {
 
 
 // ─── EXERCISE INFO MODAL ──────────────────────────────────────────────────────
+// Known wger.de base exercise IDs — used as fallback if search returns wrong result
+const WGER_IDS = {
+  "Bench Press":192,"Incline DB Press":195,"DB Flat Press":194,"Push-Ups":66,
+  "Cable Crossover":87,"Machine Chest Press":70,"Floor Press":196,"Dips":71,
+  "Close-Grip Push-Ups":98,"Overhead Press":59,"DB Shoulder Press":62,
+  "Lateral Raises":254,"Push Press":61,"Arnold Press":255,"Face Pulls":126,
+  "DB Front Raise":256,"DB Upright Row":257,"Cable Tricep Pushdown":95,
+  "Skull Crushers":96,"Overhead Tricep Extension":93,"DB Kickback":97,
+  "Close-Grip Bench":196,"Rope Pushdown":95,"Diamond Push-Ups":66,
+  "Deadlift":29,"Barbell Row":213,"Pendlay Row":214,"Pull-Ups":31,
+  "Weighted Pull-Ups":31,"Lat Pulldown":36,"Cable Row":115,"DB Row":193,
+  "T-Bar Row":215,"Chest-Supported Row":113,"Inverted Row":114,
+  "Trap Bar Deadlift":29,"Power Clean":228,"Straight-Arm Pushdown":120,
+  "Barbell Curl":79,"Hammer Curl":85,"Incline DB Curl":84,"Cable Curl":80,
+  "Preacher Curl":81,"EZ Bar Curl":82,"Concentration Curl":83,
+  "DB Shrug":269,"Barbell Shrug":268,"Trap Bar Shrug":268,"Squat":111,
+  "Leg Press":60,"Bulgarian Split Squat":319,"Goblet Squat":322,
+  "Leg Extension":105,"Hack Squat":316,"Box Squat":111,"Step-Ups":144,
+  "Walking Lunges":142,"Jump Squat":111,"Romanian Deadlift":91,
+  "Leg Curl":110,"Nordic Curl":199,"Stiff-Leg Deadlift":91,"Hip Thrust":346,
+  "Glute Bridge":347,"Cable Kickback":349,"Sumo Deadlift":29,
+  "Calf Raises":197,"Seated Calf Raise":198,"Donkey Calf Raise":197,
+  "Single-Leg Calf Raise":197,"Box Jump":143,"Broad Jump":143,
+  "Kettlebell Swing":227,"DB Snatch":228,"Medicine Ball Slam":143,
+};
+
 const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
-  const [data, setData] = useState(null);   // { description, images, muscles }
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!exerciseName) return;
-    setLoading(true); setError(false); setData(null);
+    setLoading(true);
+    setData(null);
 
     const fetchInfo = async () => {
+      const BASE = "https://wger.de";
+      let baseId = WGER_IDS[exerciseName] || null;
+      let desc = "";
+      let muscles = [];
+      let images = [];
+
       try {
-        const BASE = "https://wger.de";
+        // If no known ID, try search
+        if (!baseId) {
+          const searchRes = await fetch(
+            `${BASE}/api/v2/exercise/search/?term=${encodeURIComponent(exerciseName)}&language=english&format=json`
+          );
+          const searchData = await searchRes.json();
+          const suggestions = searchData?.suggestions || [];
+          const norm = s => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+          const target = norm(exerciseName);
+          const match = suggestions.find(s =>
+            norm(s.value || "") === target ||
+            norm(s.value || "").includes(target) ||
+            target.includes(norm(s.value || ""))
+          );
+          baseId = match?.data?.base_id || match?.data?.id || null;
+        }
 
-        // Step 1: search by name
-        const searchRes = await fetch(
-          `${BASE}/api/v2/exercise/search/?term=${encodeURIComponent(exerciseName)}&language=english&format=json`
-        );
-        const searchData = await searchRes.json();
-        const suggestions = searchData?.suggestions || [];
-        if (!suggestions.length) throw new Error("not found");
+        if (baseId) {
+          // Get exercise info for description + muscles
+          const infoRes = await fetch(`${BASE}/api/v2/exerciseinfo/${baseId}/?format=json`);
+          const info = await infoRes.json();
+          const engTrans = (info.translations || []).find(t => t.language === 2);
+          desc = (engTrans?.description || "").replace(/<[^>]+>/g, "").trim();
+          muscles = [
+            ...(info.muscles || []).map(m => m.name_en || m.name),
+            ...(info.muscles_secondary || []).map(m => `${m.name_en || m.name} (secondary)`),
+          ];
 
-        // Find the best match — suggestion value should closely match exercise name
-        const normalize = s => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
-        const target = normalize(exerciseName);
-        const match = suggestions.find(s => normalize(s.value || "").includes(target) || target.includes(normalize(s.value || "")))
-          || suggestions[0];
-
-        const baseId = match?.data?.base_id || match?.data?.id;
-        if (!baseId) throw new Error("no id");
-
-        // Step 2: get full exercise info
-        const infoRes = await fetch(`${BASE}/api/v2/exerciseinfo/${baseId}/?format=json`);
-        const info = await infoRes.json();
-
-        // English description — strip HTML
-        const engTranslation = (info.translations || []).find(t => t.language === 2);
-        const desc = (engTranslation?.description || "").replace(/<[^>]+>/g, "").trim();
-
-        // Images from exerciseimage endpoint (most reliable)
-        const imgRes = await fetch(`${BASE}/api/v2/exerciseimage/?exercise_base=${baseId}&is_main=True&format=json`);
-        const imgData = await imgRes.json();
-        let images = (imgData.results || [])
-          .map(img => {
-            const src = img.image || "";
-            return src.startsWith("http") ? src : `${BASE}${src}`;
-          })
-          .filter(Boolean)
-          .slice(0, 2);
-
-        // Fallback to exerciseinfo images if exerciseimage returned nothing
-        if (!images.length) {
-          images = (info.images || [])
+          // Get images from exerciseimage endpoint
+          const imgRes = await fetch(
+            `${BASE}/api/v2/exerciseimage/?exercise_base=${baseId}&format=json`
+          );
+          const imgData = await imgRes.json();
+          images = (imgData.results || [])
             .map(img => {
               const src = img.image || "";
               return src.startsWith("http") ? src : `${BASE}${src}`;
@@ -1199,19 +1222,12 @@ const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
             .filter(Boolean)
             .slice(0, 2);
         }
-
-        // Muscles
-        const muscles = [
-          ...(info.muscles || []).map(m => m.name_en || m.name),
-          ...(info.muscles_secondary || []).map(m => `${m.name_en || m.name} (secondary)`),
-        ];
-
-        setData({ desc, images, muscles });
       } catch (e) {
-        setError(true);
-      } finally {
-        setLoading(false);
+        // Silently fall through — we'll show what we have
       }
+
+      setData({ desc, images, muscles, found: !!baseId });
+      setLoading(false);
     };
 
     fetchInfo();
@@ -1219,21 +1235,17 @@ const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
 
   return (
     <>
-      {/* Backdrop */}
       <div onClick={onClose} style={{
         position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
         zIndex: 500, backdropFilter: "blur(6px)",
       }} />
-
-      {/* Sheet */}
       <div style={{
         position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)",
         width: "100%", maxWidth: 430, background: "#13131a",
         borderRadius: "24px 24px 0 0", border: "1px solid rgba(255,255,255,0.1)",
         borderBottom: "none", zIndex: 501,
         height: "85vh", overflowY: "scroll",
-        WebkitOverflowScrolling: "touch",
-        touchAction: "pan-y",
+        WebkitOverflowScrolling: "touch", touchAction: "pan-y",
       }}>
         {/* Handle */}
         <div style={{ display: "flex", justifyContent: "center", padding: "14px 0 0" }}>
@@ -1253,38 +1265,30 @@ const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
           }}>✕</button>
         </div>
 
-        <div style={{ padding: "0 20px 48px" }}>
-          {loading && (
-            <div style={{ textAlign: "center", padding: "40px 0", color: "#555" }}>
-              <div style={{ fontSize: 28, marginBottom: 12 }}>⏳</div>
-              <div style={{ fontSize: 13 }}>Loading exercise info...</div>
+        <div style={{ padding: "0 20px 60px" }}>
+          {loading ? (
+            <div style={{ textAlign: "center", padding: "48px 0", color: "#555" }}>
+              <div style={{ fontSize: 24, marginBottom: 10 }}>⏳</div>
+              <div style={{ fontSize: 13 }}>Loading...</div>
             </div>
-          )}
-
-          {error && !loading && (
-            <div style={{ textAlign: "center", padding: "32px 0" }}>
-              <div style={{ fontSize: 40, marginBottom: 12 }}>🏋️</div>
-              <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>{exerciseName}</div>
-              <div style={{ fontSize: 13, color: "#666", lineHeight: 1.6 }}>
-                No guide available for this exercise yet. Ask a trainer or search YouTube for a demo.
-              </div>
-            </div>
-          )}
-
-          {data && !loading && (
+          ) : (
             <>
-              {/* Image */}
+              {/* Images */}
               {data.images.length > 0 ? (
                 <div style={{ marginBottom: 20, borderRadius: 16, overflow: "hidden", background: "#1a1a2e", display: "flex", gap: 2 }}>
                   {data.images.map((src, i) => (
-                    <img key={i} src={src} alt={`${exerciseName} ${i+1}`}
+                    <img key={i} src={src} alt={`${exerciseName} ${i + 1}`}
                       style={{ flex: 1, width: 0, maxHeight: 240, objectFit: "cover", display: "block" }}
-                      onError={e => { e.target.parentNode.style.display = "none"; }}
+                      onError={e => { e.target.style.display = "none"; }}
                     />
                   ))}
                 </div>
               ) : (
-                <div style={{ marginBottom: 20, borderRadius: 16, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", padding: "28px 20px", textAlign: "center" }}>
+                <div style={{
+                  marginBottom: 20, borderRadius: 16,
+                  background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+                  padding: "28px 20px", textAlign: "center",
+                }}>
                   <div style={{ fontSize: 13, color: "#555" }}>No image available for this exercise</div>
                 </div>
               )}
@@ -1879,7 +1883,7 @@ const HistoryScreen = ({ exerciseLogs, accentColor }) => {
 };
 
 // ─── PROFILE SCREEN ───────────────────────────────────────────────────────────
-const ProfileScreen = ({ user, phase, authUser, cloudLoading, onReset, onSaveName, onSignOut, onAuth, accentColor, phases }) => {
+const ProfileScreen = ({ user, phase, authUser, cloudLoading, onReset, onSaveName, onSignOut, onAuth, accentColor, phases, onEditPrefs }) => {
   const [name, setName] = useState(user.name);
   const [saved, setSaved] = useState(false);
   const startDate = new Date(user.start_date);
@@ -1977,6 +1981,13 @@ const ProfileScreen = ({ user, phase, authUser, cloudLoading, onReset, onSaveNam
           </div>
         ))}
       </div>
+
+      <button
+        style={{ ...S.bigBtn(accentColor), marginBottom: 10 }}
+        onClick={onEditPrefs}
+      >
+        ✏️ Edit Workout Preferences
+      </button>
 
       <button
         style={{ ...S.bigBtn("#444"), color: "#ff6b35", boxShadow: "none", marginBottom: 12 }}
@@ -2758,6 +2769,7 @@ export default function App() {
             onAuth={handleAuth}
             accentColor={accentColor}
             phases={genderPalette}
+            onEditPrefs={() => setShowOnboarding(true)}
           />
         );
       default:
