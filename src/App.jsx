@@ -310,39 +310,41 @@ const setStore = (key, val) => {
   try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
 };
 
-const getPhaseAndDay = (workoutCount, exerciseLogs, phaseOverride, palette) => {
+const getPhaseAndDay = (workoutCount, exerciseLogs, phaseOverride, palette, phaseStartDate) => {
   const count = workoutCount || 0;
   const WORKOUTS_PER_PHASE = 12;
-  // phaseOverride lets user manually jump to a phase; it resets the day counter
+  const phases = palette || PHASES_MALE;
   const phaseIndex = phaseOverride != null
-    ? phaseOverride % (palette || PHASES_MALE).length
-    : Math.floor(count / WORKOUTS_PER_PHASE) % (palette || PHASES_MALE).length;
+    ? phaseOverride % phases.length
+    : Math.floor(count / WORKOUTS_PER_PHASE) % phases.length;
   const dayIndex = count % 3;
   const workoutsInPhase = phaseOverride != null ? 0 : count % WORKOUTS_PER_PHASE;
 
-  // Day counter: days since first workout of current phase
-  const sortedLogs = (exerciseLogs || [])
-    .slice()
-    .sort((a, b) => new Date(a.date) - new Date(b.date));
-  const phaseStartLogIndex = phaseOverride != null
-    ? null  // override resets counter — no reference date
-    : Math.floor(count / WORKOUTS_PER_PHASE) * WORKOUTS_PER_PHASE;
-  const workoutDates = [...new Set(sortedLogs.map(l => l.date.split("T")[0]))];
-  const phaseFirstDate = (phaseStartLogIndex != null && workoutDates[phaseStartLogIndex])
-    ? new Date(workoutDates[phaseStartLogIndex])
-    : null;
-
-  let phaseDay = workoutsInPhase;
-  if (phaseFirstDate) {
+  // Day counter: real calendar days since the phase start date
+  // phaseStartDate is stored in the profile and set when user enters a new phase
+  let phaseDay = 0;
+  if (phaseStartDate) {
+    const start = new Date(phaseStartDate);
     const now = new Date();
-    phaseDay = Math.floor((now - phaseFirstDate) / (1000 * 60 * 60 * 24));
+    phaseDay = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+  } else {
+    // Fallback: estimate from exercise logs
+    const sortedLogs = (exerciseLogs || [])
+      .slice().sort((a, b) => new Date(a.date) - new Date(b.date));
+    const workoutDates = [...new Set(sortedLogs.map(l => l.date.split("T")[0]))];
+    const phaseStartLogIndex = phaseOverride != null ? null
+      : Math.floor(count / WORKOUTS_PER_PHASE) * WORKOUTS_PER_PHASE;
+    const phaseFirstDate = (phaseStartLogIndex != null && workoutDates[phaseStartLogIndex])
+      ? new Date(workoutDates[phaseStartLogIndex]) : null;
+    if (phaseFirstDate) {
+      phaseDay = Math.floor((new Date() - phaseFirstDate) / (1000 * 60 * 60 * 24));
+    }
   }
 
-  const phases = palette || PHASES_MALE;
   return {
     phase: phases[phaseIndex],
     dayKey: WORKOUT_DAYS[dayIndex],
-    phaseDay: Math.min(phaseDay, 29),
+    phaseDay: Math.max(0, phaseDay),
     workoutsInPhase,
     phaseIndex,
   };
@@ -605,7 +607,7 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
   }).map((l) => l.date).filter((v, i, a) => a.indexOf(v) === i).length;
 
   const latestWeight = weightLogs.length ? weightLogs[weightLogs.length - 1].weight_value : null;
-  const progressPct = Math.round((phaseDay / 30) * 100);
+  const progressPct = Math.min(100, Math.round((phaseDay / 30) * 100));
 
   return (
     <div style={S.scroll}>
@@ -641,7 +643,10 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
             </div>
             <div style={{ textAlign: "right" }}>
               <div style={{ fontSize: 11, color: "#666", textTransform: "uppercase", letterSpacing: "0.08em" }}>Day</div>
-              <div style={{ fontSize: 28, fontWeight: 900, color: "#fff" }}>{phaseDay}<span style={{ fontSize: 14, color: "#555" }}>/30</span></div>
+              <div style={{ fontSize: 28, fontWeight: 900, color: "#fff" }}>
+                {phaseDay > 30 ? <span style={{ color: accentColor }}>{phaseDay}</span> : phaseDay}
+                <span style={{ fontSize: 14, color: "#555" }}>/30</span>
+              </div>
             </div>
           </div>
           {/* Phase switcher pills */}
@@ -668,7 +673,9 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
           <div style={{ background: "rgba(255,255,255,0.07)", borderRadius: 8, height: 6, overflow: "hidden" }}>
             <div style={{ width: `${progressPct}%`, height: "100%", background: `linear-gradient(90deg, ${phase.color}, ${phase.color}99)`, borderRadius: 8, transition: "width 0.5s ease" }} />
           </div>
-          <div style={{ fontSize: 11, color: "#555", marginTop: 6, textAlign: "right" }}>{30 - phaseDay} days until next phase</div>
+          <div style={{ fontSize: 11, color: "#555", marginTop: 6, textAlign: "right" }}>
+            {phaseDay >= 30 ? "Phase complete — switch when ready" : `${30 - phaseDay} days remaining`}
+          </div>
         </div>
 
         {/* Stats row */}
@@ -1067,68 +1074,63 @@ const AddExercisePanel = ({ workout, onAdd, onClose, accentColor }) => {
 // ─── CELEBRATION SCREEN ───────────────────────────────────────────────────────
 const CelebrationScreen = ({ celebration, accentColor, onDone }) => {
   const [visible, setVisible] = useState(false);
-  const [showBtn, setShowBtn] = useState(false);
 
   useEffect(() => {
-    // Stagger entrance: emojis pop in, then text, then button
-    const t1 = setTimeout(() => setVisible(true), 80);
-    const t2 = setTimeout(() => setShowBtn(true), 2200);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
+    const t = setTimeout(() => setVisible(true), 60);
+    return () => clearTimeout(t);
   }, []);
 
   return (
     <div
-      onClick={showBtn ? onDone : undefined}
+      onClick={onDone}
       style={{
         minHeight: "100vh", display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center",
-        padding: 32, textAlign: "center",
-        background: "radial-gradient(ellipse at center, rgba(0,255,136,0.06) 0%, #0a0a0f 70%)",
-        cursor: showBtn ? "pointer" : "default",
+        padding: 32, textAlign: "center", cursor: "pointer",
+        background: "radial-gradient(ellipse at center, rgba(0,255,136,0.08) 0%, #0a0a0f 70%)",
       }}
     >
-      {/* Emojis — scale in */}
+      {/* Emojis */}
       <div style={{
-        fontSize: 80, lineHeight: 1.2, marginBottom: 20,
-        transform: visible ? "scale(1)" : "scale(0.3)",
+        fontSize: 88, lineHeight: 1.2, marginBottom: 24,
+        transform: visible ? "scale(1)" : "scale(0.2)",
         opacity: visible ? 1 : 0,
-        transition: "transform 0.5s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease",
+        transition: "transform 0.6s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease",
       }}>
         {celebration.emojis}
       </div>
 
       {/* Title */}
       <div style={{
-        fontSize: 30, fontWeight: 900, color: accentColor, marginBottom: 10,
+        fontSize: 32, fontWeight: 900, color: accentColor, marginBottom: 12,
         opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(20px)",
-        transition: "opacity 0.5s ease 0.3s, transform 0.5s ease 0.3s",
+        transform: visible ? "translateY(0)" : "translateY(24px)",
+        transition: "opacity 0.5s ease 0.25s, transform 0.5s ease 0.25s",
       }}>
         Workout Complete!
       </div>
 
       {/* Message */}
       <div style={{
-        fontSize: 16, color: "#888", marginBottom: 56, lineHeight: 1.6, maxWidth: 280,
+        fontSize: 16, color: "#888", marginBottom: 64, lineHeight: 1.7, maxWidth: 280,
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0)" : "translateY(16px)",
-        transition: "opacity 0.5s ease 0.55s, transform 0.5s ease 0.55s",
+        transition: "opacity 0.5s ease 0.45s, transform 0.5s ease 0.45s",
       }}>
         {celebration.msg}
       </div>
 
-      {/* Button — fades in after delay */}
+      {/* Button — always visible, user can tap anytime */}
       <div style={{
         width: "100%", maxWidth: 360,
-        opacity: showBtn ? 1 : 0,
-        transform: showBtn ? "translateY(0)" : "translateY(12px)",
-        transition: "opacity 0.4s ease, transform 0.4s ease",
-        pointerEvents: showBtn ? "auto" : "none",
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(16px)",
+        transition: "opacity 0.5s ease 0.6s, transform 0.5s ease 0.6s",
       }}>
         <button style={S.bigBtn(accentColor)} onClick={onDone}>
           Back to Dashboard
         </button>
-        <div style={{ fontSize: 12, color: "#444", marginTop: 10 }}>
+        <div style={{ fontSize: 12, color: "#555", marginTop: 12 }}>
           Tap anywhere to continue
         </div>
       </div>
@@ -2590,7 +2592,7 @@ export default function App() {
   };
 
   const handleWorkoutSave = async () => {
-    // Called as soon as workout finishes — saves data but does NOT navigate
+    // Save data — do NOT clear saved state or navigate (celebration is showing)
     if (authUser) {
       const newCount = cloudWorkoutCount + 1;
       setCloudWorkoutCount(newCount);
@@ -2598,11 +2600,12 @@ export default function App() {
     } else {
       setGuestWorkoutCount(prev => prev + 1);
     }
-    setSavedWorkoutState(null);
+    // Note: savedWorkoutState cleared in handleWorkoutFinish after user dismisses
   };
 
   const handleWorkoutFinish = async () => {
-    // Called when user dismisses the celebration screen — navigate home
+    // Called when user dismisses the celebration screen — clear state and navigate
+    setSavedWorkoutState(null);
     setIsWorkingOut(false);
     setTab("home");
   };
@@ -2633,11 +2636,15 @@ export default function App() {
   };
 
   const handleSetPhase = async (newPhaseIdx) => {
+    const now = new Date().toISOString();
     if (authUser) {
-      await supabase.from("profiles").update({ phase_override: newPhaseIdx }).eq("id", authUser.id);
-      setCloudProfile(p => ({ ...p, phase_override: newPhaseIdx }));
+      await supabase.from("profiles").update({
+        phase_override: newPhaseIdx,
+        phase_start_date: now,
+      }).eq("id", authUser.id);
+      setCloudProfile(p => ({ ...p, phase_override: newPhaseIdx, phase_start_date: now }));
     } else {
-      setGuestProfile(p => ({ ...p, phase_override: newPhaseIdx }));
+      setGuestProfile(p => ({ ...p, phase_override: newPhaseIdx, phase_start_date: now }));
     }
   };
 
@@ -2655,7 +2662,8 @@ export default function App() {
     : gender === "male" ? PHASES_MALE
     : PHASES_DEFAULT; // "other" uses green (default)
   const phaseOverride = profile?.phase_override ?? null;
-  const { phase, dayKey, phaseDay, workoutsInPhase, phaseIndex } = getPhaseAndDay(workoutCount, exerciseLogs, phaseOverride, genderPalette);
+  const phaseStartDate = profile?.phase_start_date || null;
+  const { phase, dayKey, phaseDay, workoutsInPhase, phaseIndex } = getPhaseAndDay(workoutCount, exerciseLogs, phaseOverride, genderPalette, phaseStartDate);
   const accentColor = phase.color;
   const user = profile || { name: "Athlete", current_weight: null, start_date: new Date().toISOString() };
 
@@ -2669,7 +2677,10 @@ export default function App() {
   const workoutPlan = generateWorkoutPlan(userPrefs);
   const planDays = workoutPlan.days;
   const activeDayKey = selectedDayKey || (planDays[workoutCount % planDays.length]?.key) || "A";
-  const needsOnboarding = !profile?.goal;
+  // Only trigger onboarding once we've actually finished loading
+  // (profile null during cloudLoading should NOT trigger onboarding)
+  const profileLoaded = !authLoading && (authUser ? !cloudLoading : true);
+  const needsOnboarding = profileLoaded && !profile?.goal;
 
   // Brief loading spinner only while checking auth session on first load
   if (authLoading) {
@@ -2692,6 +2703,7 @@ export default function App() {
             equipment: prefs.equipment,
             frequency: prefs.frequency,
             gender: prefs.gender,
+            phase_start_date: new Date().toISOString(),
           };
           if (authUser) {
             await supabase.from("profiles").update(update).eq("id", authUser.id);
