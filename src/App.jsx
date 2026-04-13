@@ -1810,6 +1810,102 @@ const WeightScreen = ({ weightLogs, onLog, accentColor }) => {
   );
 };
 
+// ─── EXERCISE PROGRESS CHART ─────────────────────────────────────────────────
+const ExerciseProgressChart = ({ exerciseName, logs, accentColor, onClose }) => {
+  const history = logs
+    .filter(l => l.exercise_name === exerciseName)
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  const weights = history.map(l => l.weight_used).filter(Boolean);
+  const last = weights.length ? weights[weights.length - 1] : null;
+  const best = weights.length ? Math.max(...weights) : null;
+  const gain = weights.length >= 2 ? +(weights[weights.length-1] - weights[0]).toFixed(1) : 0;
+
+  const chartData = history.map(l => ({
+    value: l.weight_used,
+    label: new Date(l.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+  }));
+
+  return (
+    <div style={{ ...S.scroll, padding: "0", overflowY: "auto", height: "100vh", boxSizing: "border-box" }}>
+      {/* Header */}
+      <div style={{ padding: "56px 20px 20px", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <div>
+          <div style={{ fontSize: 11, color: "#666", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Progress</div>
+          <div style={{ fontSize: 22, fontWeight: 900, lineHeight: 1.2 }}>{exerciseName}</div>
+          <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>{history.length} session{history.length !== 1 ? "s" : ""} logged</div>
+        </div>
+        <button onClick={onClose} style={{
+          background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 12,
+          width: 40, height: 40, cursor: "pointer", display: "flex",
+          alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 4,
+          color: "#aaa", fontSize: 20,
+        }}>✕</button>
+      </div>
+
+      <div style={{ padding: "0 16px 120px" }}>
+        {/* Stat pills */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 20 }}>
+          {[
+            { label: "Current", value: `${last ?? "—"} lbs`, color: accentColor },
+            { label: "Best",    value: `${best ?? "—"} lbs`, color: "#ffd700" },
+            { label: "Total Gain", value: gain >= 0 ? `+${gain} lbs` : `${gain} lbs`, color: gain >= 0 ? accentColor : "#ff6b35" },
+          ].map(s => (
+            <div key={s.label} style={{ background: "rgba(255,255,255,0.04)", borderRadius: 14, padding: "12px 10px", textAlign: "center" }}>
+              <div style={{ fontSize: 10, color: "#666", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>{s.label}</div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: s.color }}>{s.value}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Weight chart */}
+        <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 20, padding: "16px 12px 10px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 20 }}>
+          <div style={{ fontSize: 12, color: "#666", marginBottom: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" }}>Weight Over Time</div>
+          {chartData.length >= 2 ? (
+            <>
+              <LineChart data={chartData} color={accentColor} height={140} />
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
+                <div style={{ fontSize: 10, color: "#555" }}>{chartData[0]?.label}</div>
+                <div style={{ fontSize: 10, color: "#555" }}>{chartData[chartData.length - 1]?.label}</div>
+              </div>
+            </>
+          ) : (
+            <div style={{ height: 80, display: "flex", alignItems: "center", justifyContent: "center", color: "#555", fontSize: 13 }}>
+              Log at least 2 sessions to see your trend
+            </div>
+          )}
+        </div>
+
+        {/* Session log */}
+        <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>All Sessions</div>
+        {history.slice().reverse().map((log, i) => {
+          const isLatest = i === 0;
+          return (
+            <div key={i} style={{
+              display: "flex", justifyContent: "space-between", alignItems: "center",
+              padding: "13px 16px", marginBottom: 8,
+              background: isLatest ? `${accentColor}0d` : "rgba(255,255,255,0.03)",
+              border: `1px solid ${isLatest ? accentColor + "33" : "rgba(255,255,255,0.07)"}`,
+              borderRadius: 14,
+            }}>
+              <div>
+                <div style={{ fontSize: 13, color: isLatest ? "#fff" : "#bbb", fontWeight: isLatest ? 700 : 400 }}>
+                  {new Date(log.date).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+                  {isLatest && <span style={{ marginLeft: 8, fontSize: 10, color: accentColor, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>Latest</span>}
+                </div>
+                <div style={{ fontSize: 11, color: "#666", marginTop: 2 }}>{log.sets} sets × {log.reps} reps</div>
+              </div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: isLatest ? accentColor : "#888" }}>
+                {log.weight_used}<span style={{ fontSize: 11, color: "#555", fontWeight: 400 }}> lbs</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 const HistoryScreen = ({ exerciseLogs, accentColor }) => {
   const [selectedExercise, setSelectedExercise] = useState(null);
 
