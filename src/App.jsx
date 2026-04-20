@@ -1692,6 +1692,20 @@ const WorkoutScreen = ({ phase, dayKey, workoutDay, exerciseLogs, onSave, onFini
         </button>
       )}
 
+      {/* Skip exercise — only show if no sets logged yet */}
+      {completedForCurrent === 0 && (
+        <button
+          onClick={nextExercise}
+          style={{
+            width: "100%", marginTop: 8, padding: "11px",
+            background: "transparent", border: "none",
+            color: "#555", fontSize: 13, cursor: "pointer",
+          }}
+        >
+          Skip exercise →
+        </button>
+      )}
+
       {/* Exercise info + add */}
       <div style={{ ...S.card(), marginTop:16, display:"flex", gap:16, justifyContent:"space-between", alignItems:"center" }}>
         <div style={{ display:"flex", gap:20 }}>
