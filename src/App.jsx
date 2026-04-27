@@ -597,6 +597,7 @@ const S = {
 // ─── HOME SCREEN ──────────────────────────────────────────────────────────────
 const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, workoutCount, workoutsInPhase, onStartWorkout, onSetPhase, phaseIndex, accentColor, planDays, onEditPrefs, phases }) => {
   const [activeDayKey, setActiveDayKey] = useState(dayKey);
+  useEffect(() => { setActiveDayKey(dayKey); }, [dayKey]);
   const allWorkouts = planDays || [];
   const workout = allWorkouts.find(d => d.key === activeDayKey) || allWorkouts[0] || { name: "Workout", icon: "⚡", exercises: [], cardio: { hasCardio: false } };
   // workoutCount comes from props
@@ -695,31 +696,20 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
         {/* Today's Workout Card */}
         <div style={{ ...S.card(`${accentColor}33`), marginBottom: 16, background: `linear-gradient(135deg, rgba(0,255,136,0.05), rgba(10,10,15,1))` }}>
           {/* Workout title row */}
-          {(() => {
-            const todayWorkout = allWorkouts.find(w => w.key === dayKey) || workout;
-            const isViewingToday = activeDayKey === dayKey;
-            return (
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-                <div>
-                  <div style={S.tag(accentColor)}>Today's Workout</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, marginTop: 8, letterSpacing: "-0.01em" }}>
-                    <span style={{ padding: "2px 10px 2px 6px", borderRadius: 8, background: `${accentColor}22`, border: `1px solid ${accentColor}55` }}>
-                      {todayWorkout.icon} {todayWorkout.name}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: 12, color: "#888", marginTop: 6 }}>
-                    {todayWorkout.exercises.length} exercises{todayWorkout.cardio?.hasCardio ? ` · ${todayWorkout.cardio.duration}min cardio` : ""}
-                  </div>
-                  {!isViewingToday && (
-                    <div style={{ fontSize: 11, color: "#555", marginTop: 4 }}>Previewing {workout.name}</div>
-                  )}
-                </div>
-                <div style={{ ...S.tag(todayWorkout.cardio?.type === "HIIT" ? "#ff6b35" : "#00cfff"), flexShrink: 0 }}>
-                  {todayWorkout.cardio?.type}
-                </div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+            <div>
+              <div style={S.tag(accentColor)}>Today's Workout</div>
+              <div style={{ fontSize: 22, fontWeight: 800, marginTop: 8, letterSpacing: "-0.01em" }}>
+                {workout.icon} {workout.name}
               </div>
-            );
-          })()}
+              <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>
+                {workout.exercises.length} exercises{workout.cardio.hasCardio ? ` · ${workout.cardio.duration}min cardio` : ""}
+              </div>
+            </div>
+            <div style={{ ...S.tag(workout.cardio.type === "HIIT" ? "#ff6b35" : "#00cfff"), flexShrink: 0 }}>
+              {workout.cardio.type}
+            </div>
+          </div>
 
           {/* Change workout picker */}
           <div style={{ display: "flex", gap: 6, marginBottom: 14, flexWrap: allWorkouts.length > 3 ? "wrap" : "nowrap" }}>
@@ -2705,13 +2695,16 @@ export default function App() {
   const [guestWorkoutCount, setGuestWorkoutCount] = useState(() => getStore("workoutCount", 0));
 
   // ── Cloud state (only when logged in) ────────────────────────────────────
-  const [cloudProfile, setCloudProfile] = useState(null);
+  // Seed from localStorage cache so the correct theme shows instantly before Supabase responds
+  const [cloudProfile, setCloudProfile] = useState(() => getStore("cloudProfileCache", null));
   const [cloudWeightLogs, setCloudWeightLogs] = useState([]);
   const [cloudExerciseLogs, setCloudExerciseLogs] = useState([]);
   const [cloudWorkoutCount, setCloudWorkoutCount] = useState(0);
 
   // Persist guest data to localStorage
   useEffect(() => { setStore("user", guestProfile); }, [guestProfile]);
+  // Cache cloud profile so theme loads instantly on next open
+  useEffect(() => { if (cloudProfile) setStore("cloudProfileCache", cloudProfile); }, [cloudProfile]);
   useEffect(() => { setStore("weightLogs", guestWeightLogs); }, [guestWeightLogs]);
   useEffect(() => { setStore("exerciseLogs", guestExerciseLogs); }, [guestExerciseLogs]);
   useEffect(() => { setStore("workoutCount", guestWorkoutCount); }, [guestWorkoutCount]);
@@ -2728,6 +2721,7 @@ export default function App() {
       } else if (event === "SIGNED_OUT") {
         setAuthUser(null);
         setCloudProfile(null);
+        setStore("cloudProfileCache", null);
         setCloudWeightLogs([]);
         setCloudExerciseLogs([]);
         setCloudWorkoutCount(0);
