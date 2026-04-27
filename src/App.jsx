@@ -2676,7 +2676,7 @@ const AuthScreen = ({ onAuth }) => {
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
 export default function App() {
   const [authUser, setAuthUser] = useState(null);
-  const [authLoading, setAuthLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(false);
   const [tab, setTab] = useState("home");
   const [isWorkingOut, setIsWorkingOut] = useState(false);
   const [cloudLoading, setCloudLoading] = useState(false);
@@ -2773,7 +2773,9 @@ export default function App() {
   };
 
   // ── Active data: cloud if logged in, guest otherwise ─────────────────────
-  const isLoggedIn = !!authUser && !cloudLoading;
+  // Use authUser (not cloudLoading) so cached cloud data shows instantly on open.
+  // cloudLoading only gates UI that needs fresh data (e.g. profile screen spinner).
+  const isLoggedIn = !!authUser;
   const profile = isLoggedIn ? cloudProfile : guestProfile;
   const weightLogs = isLoggedIn ? cloudWeightLogs : guestWeightLogs;
   const exerciseLogs = isLoggedIn ? cloudExerciseLogs : guestExerciseLogs;
@@ -2895,17 +2897,12 @@ export default function App() {
   const activeDayKey = selectedDayKey || (planDays[workoutCount % planDays.length]?.key) || "A";
   // Only trigger onboarding once we've actually finished loading
   // (profile null during cloudLoading should NOT trigger onboarding)
-  const profileLoaded = !authLoading && (authUser ? !cloudLoading : true);
+  // profileLoaded: for cloud users, treat cached cloudProfile as sufficient to skip onboarding
+  const profileLoaded = authUser ? !!cloudProfile : true;
   const needsOnboarding = profileLoaded && !profile?.goal;
 
   // Brief loading spinner only while checking auth session on first load
-  if (authLoading) {
-    return (
-      <div style={{ background: "#0a0a0f", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ fontSize: 32 }}>⚡</div>
-      </div>
-    );
-  }
+  // authLoading spinner removed — render immediately with cached data
 
   // Show onboarding if user has no preferences set yet
   if (needsOnboarding || showOnboarding) {
