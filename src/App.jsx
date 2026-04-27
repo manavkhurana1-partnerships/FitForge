@@ -791,6 +791,12 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
 // ─── REST TIMER ────────────────────────────────
 const TIMER_KEY = "fitforge_timer_end";
 
+const requestNotifPermission = () => {
+  if (typeof Notification !== "undefined" && Notification.permission === "default") {
+    Notification.requestPermission().catch(() => {});
+  }
+};
+
 const playDing = () => {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -807,10 +813,24 @@ const playDing = () => {
       osc.stop(ctx.currentTime + i * 0.12 + 0.4);
     });
   } catch(e) {}
+  // Push notification — fires even if app is backgrounded
+  try {
+    if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+      new Notification("Rest Complete 💪", {
+        body: "Time to crush the next set!",
+        icon: "/favicon.ico",
+        tag: "fitforge-rest-timer",
+        renotify: true,
+        silent: false,
+      });
+    }
+  } catch(e) {}
 };
 
 const RestTimer = ({ onDone, accentColor }) => {
   const DURATION = 90;
+  // Request notification permission as soon as timer opens
+  useEffect(() => { requestNotifPermission(); }, []);
   // Store absolute end time so timer survives tab switches and app backgrounding
   const [endTime] = useState(() => {
     const stored = localStorage.getItem(TIMER_KEY);
@@ -1140,100 +1160,139 @@ const CelebrationScreen = ({ celebration, accentColor, onDone }) => {
 
 
 // ─── EXERCISE INFO MODAL ──────────────────────────────────────────────────────
-// Known wger.de base exercise IDs — used as fallback if search returns wrong result
-const WGER_IDS = {
-  "Bench Press":192,"Incline DB Press":195,"DB Flat Press":194,"Push-Ups":66,
-  "Cable Crossover":87,"Machine Chest Press":70,"Floor Press":196,"Dips":71,
-  "Close-Grip Push-Ups":98,"Overhead Press":59,"DB Shoulder Press":62,
-  "Lateral Raises":254,"Push Press":61,"Arnold Press":255,"Face Pulls":126,
-  "DB Front Raise":256,"DB Upright Row":257,"Cable Tricep Pushdown":95,
-  "Skull Crushers":96,"Overhead Tricep Extension":93,"DB Kickback":97,
-  "Close-Grip Bench":196,"Rope Pushdown":95,"Diamond Push-Ups":66,
-  "Deadlift":29,"Barbell Row":213,"Pendlay Row":214,"Pull-Ups":31,
-  "Weighted Pull-Ups":31,"Lat Pulldown":36,"Cable Row":115,"DB Row":193,
-  "T-Bar Row":215,"Chest-Supported Row":113,"Inverted Row":114,
-  "Trap Bar Deadlift":29,"Power Clean":228,"Straight-Arm Pushdown":120,
-  "Barbell Curl":79,"Hammer Curl":85,"Incline DB Curl":84,"Cable Curl":80,
-  "Preacher Curl":81,"EZ Bar Curl":82,"Concentration Curl":83,
-  "DB Shrug":269,"Barbell Shrug":268,"Trap Bar Shrug":268,"Squat":111,
-  "Leg Press":60,"Bulgarian Split Squat":319,"Goblet Squat":322,
-  "Leg Extension":105,"Hack Squat":316,"Box Squat":111,"Step-Ups":144,
-  "Walking Lunges":142,"Jump Squat":111,"Romanian Deadlift":91,
-  "Leg Curl":110,"Nordic Curl":199,"Stiff-Leg Deadlift":91,"Hip Thrust":346,
-  "Glute Bridge":347,"Cable Kickback":349,"Sumo Deadlift":29,
-  "Calf Raises":197,"Seated Calf Raise":198,"Donkey Calf Raise":197,
-  "Single-Leg Calf Raise":197,"Box Jump":143,"Broad Jump":143,
-  "Kettlebell Swing":227,"DB Snatch":228,"Medicine Ball Slam":143,
+// Fully static — no API calls. GIFs from muscles.wiki, descriptions curated inline.
+const EXERCISE_GIF = {
+  "Bench Press":            "https://muscles.wiki/wp-content/uploads/2023/01/Barbell-Bench-Press.gif",
+  "Incline DB Press":       "https://muscles.wiki/wp-content/uploads/2023/01/Incline-Dumbbell-Press.gif",
+  "DB Flat Press":          "https://muscles.wiki/wp-content/uploads/2023/01/Dumbbell-Bench-Press.gif",
+  "Push-Ups":               "https://muscles.wiki/wp-content/uploads/2023/01/Push-Up.gif",
+  "Cable Crossover":        "https://muscles.wiki/wp-content/uploads/2023/01/Cable-Crossover.gif",
+  "Machine Chest Press":    "https://muscles.wiki/wp-content/uploads/2023/01/Machine-Chest-Press.gif",
+  "Dips":                   "https://muscles.wiki/wp-content/uploads/2023/01/Tricep-Dips.gif",
+  "Close-Grip Push-Ups":    "https://muscles.wiki/wp-content/uploads/2023/01/Diamond-Push-Up.gif",
+  "Diamond Push-Ups":       "https://muscles.wiki/wp-content/uploads/2023/01/Diamond-Push-Up.gif",
+  "Overhead Press":         "https://muscles.wiki/wp-content/uploads/2023/01/Barbell-Overhead-Press.gif",
+  "DB Shoulder Press":      "https://muscles.wiki/wp-content/uploads/2023/01/Dumbbell-Shoulder-Press.gif",
+  "Lateral Raises":         "https://muscles.wiki/wp-content/uploads/2023/01/Dumbbell-Lateral-Raise.gif",
+  "Push Press":             "https://muscles.wiki/wp-content/uploads/2023/01/Push-Press.gif",
+  "Arnold Press":           "https://muscles.wiki/wp-content/uploads/2023/01/Arnold-Press.gif",
+  "Face Pulls":             "https://muscles.wiki/wp-content/uploads/2023/01/Cable-Face-Pull.gif",
+  "DB Front Raise":         "https://muscles.wiki/wp-content/uploads/2023/01/Dumbbell-Front-Raise.gif",
+  "Cable Tricep Pushdown":  "https://muscles.wiki/wp-content/uploads/2023/01/Tricep-Pushdown.gif",
+  "Rope Pushdown":          "https://muscles.wiki/wp-content/uploads/2023/01/Rope-Tricep-Pushdown.gif",
+  "Skull Crushers":         "https://muscles.wiki/wp-content/uploads/2023/01/Skull-Crusher.gif",
+  "Overhead Tricep Extension":"https://muscles.wiki/wp-content/uploads/2023/01/Overhead-Tricep-Extension.gif",
+  "Close-Grip Bench":       "https://muscles.wiki/wp-content/uploads/2023/01/Close-Grip-Bench-Press.gif",
+  "Deadlift":               "https://muscles.wiki/wp-content/uploads/2023/01/Barbell-Deadlift.gif",
+  "Trap Bar Deadlift":      "https://muscles.wiki/wp-content/uploads/2023/01/Trap-Bar-Deadlift.gif",
+  "Barbell Row":            "https://muscles.wiki/wp-content/uploads/2023/01/Barbell-Row.gif",
+  "Pendlay Row":            "https://muscles.wiki/wp-content/uploads/2023/01/Pendlay-Row.gif",
+  "Pull-Ups":               "https://muscles.wiki/wp-content/uploads/2023/01/Pull-Up.gif",
+  "Weighted Pull-Ups":      "https://muscles.wiki/wp-content/uploads/2023/01/Weighted-Pull-Up.gif",
+  "Lat Pulldown":           "https://muscles.wiki/wp-content/uploads/2023/01/Lat-Pulldown.gif",
+  "Cable Row":              "https://muscles.wiki/wp-content/uploads/2023/01/Seated-Cable-Row.gif",
+  "DB Row":                 "https://muscles.wiki/wp-content/uploads/2023/01/Dumbbell-Row.gif",
+  "T-Bar Row":              "https://muscles.wiki/wp-content/uploads/2023/01/T-Bar-Row.gif",
+  "Inverted Row":           "https://muscles.wiki/wp-content/uploads/2023/01/Inverted-Row.gif",
+  "Power Clean":            "https://muscles.wiki/wp-content/uploads/2023/01/Power-Clean.gif",
+  "Barbell Curl":           "https://muscles.wiki/wp-content/uploads/2023/01/Barbell-Curl.gif",
+  "Hammer Curl":            "https://muscles.wiki/wp-content/uploads/2023/01/Hammer-Curl.gif",
+  "Incline DB Curl":        "https://muscles.wiki/wp-content/uploads/2023/01/Incline-Dumbbell-Curl.gif",
+  "Cable Curl":             "https://muscles.wiki/wp-content/uploads/2023/01/Cable-Curl.gif",
+  "EZ Bar Curl":            "https://muscles.wiki/wp-content/uploads/2023/01/EZ-Bar-Curl.gif",
+  "Concentration Curl":     "https://muscles.wiki/wp-content/uploads/2023/01/Concentration-Curl.gif",
+  "Squat":                  "https://muscles.wiki/wp-content/uploads/2023/01/Barbell-Squat.gif",
+  "Leg Press":              "https://muscles.wiki/wp-content/uploads/2023/01/Leg-Press.gif",
+  "Bulgarian Split Squat":  "https://muscles.wiki/wp-content/uploads/2023/01/Bulgarian-Split-Squat.gif",
+  "Goblet Squat":           "https://muscles.wiki/wp-content/uploads/2023/01/Goblet-Squat.gif",
+  "Leg Extension":          "https://muscles.wiki/wp-content/uploads/2023/01/Leg-Extension.gif",
+  "Hack Squat":             "https://muscles.wiki/wp-content/uploads/2023/01/Hack-Squat.gif",
+  "Walking Lunges":         "https://muscles.wiki/wp-content/uploads/2023/01/Walking-Lunges.gif",
+  "Romanian Deadlift":      "https://muscles.wiki/wp-content/uploads/2023/01/Romanian-Deadlift.gif",
+  "Leg Curl":               "https://muscles.wiki/wp-content/uploads/2023/01/Lying-Leg-Curl.gif",
+  "Nordic Curl":            "https://muscles.wiki/wp-content/uploads/2023/01/Nordic-Curl.gif",
+  "Hip Thrust":             "https://muscles.wiki/wp-content/uploads/2023/01/Barbell-Hip-Thrust.gif",
+  "Glute Bridge":           "https://muscles.wiki/wp-content/uploads/2023/01/Glute-Bridge.gif",
+  "Sumo Deadlift":          "https://muscles.wiki/wp-content/uploads/2023/01/Sumo-Deadlift.gif",
+  "Calf Raises":            "https://muscles.wiki/wp-content/uploads/2023/01/Standing-Calf-Raise.gif",
+  "Seated Calf Raise":      "https://muscles.wiki/wp-content/uploads/2023/01/Seated-Calf-Raise.gif",
+  "Box Jump":               "https://muscles.wiki/wp-content/uploads/2023/01/Box-Jump.gif",
+  "Kettlebell Swing":       "https://muscles.wiki/wp-content/uploads/2023/01/Kettlebell-Swing.gif",
+  "Plank":                  "https://muscles.wiki/wp-content/uploads/2023/01/Plank.gif",
+  "Hanging Leg Raise":      "https://muscles.wiki/wp-content/uploads/2023/01/Hanging-Leg-Raise.gif",
+};
+
+const EXERCISE_INFO = {
+  "Bench Press":            { muscles:["Pectorals","Anterior Deltoids","Triceps"], desc:"Lie flat on a bench with feet flat on the floor. Grip the bar just outside shoulder width. Lower under control to mid-chest, then press explosively to full lockout. Retract shoulder blades throughout." },
+  "Incline DB Press":       { muscles:["Upper Chest","Anterior Deltoids","Triceps"], desc:"Set bench to 30-45°. Hold dumbbells at shoulder height, palms forward. Press to full extension then lower slowly. The incline shifts emphasis to the upper pec fibers." },
+  "DB Flat Press":          { muscles:["Pectorals","Anterior Deltoids","Triceps"], desc:"Lie flat, dumbbells at chest level. Press to full lockout, then lower with control. Allows a greater stretch at the bottom than a barbell." },
+  "Push-Ups":               { muscles:["Pectorals","Anterior Deltoids","Triceps","Core"], desc:"Hands slightly wider than shoulder-width, body in a straight line from head to heels. Lower chest to floor under control, then push back up. Brace your core and squeeze glutes throughout." },
+  "Cable Crossover":        { muscles:["Pectorals","Anterior Deltoids"], desc:"Set cables high. Step forward with a slight lean. Pull handles down and together in a hugging arc, squeezing the chest hard at the bottom. Control the return." },
+  "Machine Chest Press":    { muscles:["Pectorals","Anterior Deltoids","Triceps"], desc:"Adjust seat so handles align with mid-chest. Press to full extension, hold briefly, then return under control. Keep back flat against the pad." },
+  "Dips":                   { muscles:["Chest/Triceps","Anterior Deltoids"], desc:"Grip parallel bars and support your bodyweight at arm's length. Lower yourself by bending elbows until shoulders are below elbows, then press back up. Lean forward slightly to bias chest." },
+  "Close-Grip Push-Ups":    { muscles:["Triceps","Chest"], desc:"Place hands close together, thumbs nearly touching. Perform a push-up keeping elbows close to your sides. Heavy emphasis on triceps." },
+  "Diamond Push-Ups":       { muscles:["Triceps","Chest"], desc:"Form a diamond shape with thumbs and index fingers. Keep elbows tracking close to body as you lower and press. Maximum tricep activation." },
+  "Overhead Press":         { muscles:["Anterior Deltoids","Medial Deltoids","Triceps","Upper Traps"], desc:"Bar rests on upper chest, just below chin. Press straight up overhead, finishing with bar over mid-foot. Lock out fully at the top. Brace your core to protect lower back." },
+  "DB Shoulder Press":      { muscles:["Anterior Deltoids","Medial Deltoids","Triceps"], desc:"Hold dumbbells at shoulder height, elbows at ~90°. Press overhead to full extension, then lower with control. A slight arc inward is natural." },
+  "Lateral Raises":         { muscles:["Medial Deltoids","Anterior Deltoids"], desc:"Stand tall holding dumbbells at sides. Raise arms out to the side to shoulder height with a slight bend in the elbow. Control the descent — do not swing." },
+  "Push Press":             { muscles:["Shoulders","Triceps","Quads"], desc:"Dip slightly at the knees then drive through your legs to initiate the press. Use the leg drive to help get the bar overhead, then lock out. More weight than strict press." },
+  "Arnold Press":           { muscles:["All Three Delt Heads","Triceps"], desc:"Start with palms facing you at chin height. As you press overhead, rotate palms outward so they face forward at the top. Reverse on the way down." },
+  "Face Pulls":             { muscles:["Rear Deltoids","Rotator Cuff","Traps"], desc:"Set cable at head height with rope attachment. Pull towards your face, flaring elbows high and wide. Externally rotate at the top. Great for shoulder health." },
+  "DB Front Raise":         { muscles:["Anterior Deltoids"], desc:"Hold dumbbells in front of thighs. Raise one or both arms forward to shoulder height, keeping a slight elbow bend. Lower under control." },
+  "Cable Tricep Pushdown":  { muscles:["Triceps"], desc:"Stand at cable stack, bar or rope attachment set high. Keeping elbows pinned to your sides, extend arms fully downward. Squeeze at the bottom, control the return." },
+  "Rope Pushdown":          { muscles:["Triceps"], desc:"Use rope attachment on high cable. Spread the rope apart at full extension to maximize lateral head activation. Keep elbows fixed at sides throughout." },
+  "Skull Crushers":         { muscles:["Triceps"], desc:"Lie on a bench, bar held over your face at arm's length. Hinge only at the elbows, lowering bar toward your forehead, then extend back to start. Do not flare elbows." },
+  "Overhead Tricep Extension":{ muscles:["Triceps (Long Head)"], desc:"Hold a dumbbell or cable overhead with both hands. Lower behind your head by bending elbows, then extend fully. Stretches the long head of the tricep." },
+  "Close-Grip Bench":       { muscles:["Triceps","Chest","Anterior Deltoids"], desc:"Grip bar shoulder-width or slightly narrower. Lower to chest keeping elbows closer to body than a regular bench. Press back to lockout. Tricep-dominant variation." },
+  "Deadlift":               { muscles:["Posterior Chain","Glutes","Erectors","Hamstrings","Traps"], desc:"Bar over mid-foot, hip-width stance. Hinge at hips to grip just outside legs. Drive floor away while keeping bar close to body. Lock hips and knees out simultaneously at top. Hinge back down." },
+  "Trap Bar Deadlift":      { muscles:["Quads","Glutes","Hamstrings","Erectors"], desc:"Stand inside the trap bar, handles at sides. Sit back into the hips, grab handles, then drive through the floor. More quad involvement than conventional deadlift." },
+  "Barbell Row":            { muscles:["Back","Biceps","Rear Deltoids"], desc:"Hinge forward ~45°, bar hanging at arms' length. Pull bar to lower chest/navel, driving elbows back. Squeeze shoulder blades together at the top. Lower under control." },
+  "Pendlay Row":            { muscles:["Back","Biceps"], desc:"Bar rests on floor each rep. Horizontal torso, explosive pull to lower chest. Full stop on floor between reps eliminates momentum. Great for back strength." },
+  "Pull-Ups":               { muscles:["Lats","Biceps","Rear Deltoids"], desc:"Dead hang, overhand grip wider than shoulders. Drive elbows toward hips to pull chin over bar. Lower fully between reps to maximize range of motion." },
+  "Weighted Pull-Ups":      { muscles:["Lats","Biceps","Rear Deltoids"], desc:"Attach weight via belt or hold between feet. Same form as bodyweight pull-up. Full range of motion from dead hang to chin over bar." },
+  "Lat Pulldown":           { muscles:["Lats","Biceps","Rear Deltoids"], desc:"Grip bar wider than shoulders. Lean back slightly and pull bar to upper chest, driving elbows down and back. Squeeze lats at bottom position." },
+  "Cable Row":              { muscles:["Mid Back","Biceps","Rear Deltoids"], desc:"Sit upright with slight forward lean. Pull handle to navel, driving elbows back and squeezing shoulder blades together. Control the return to full arm extension." },
+  "DB Row":                 { muscles:["Back","Biceps"], desc:"Support with one hand on bench, other hand holds dumbbell. Pull dumbbell to hip, keeping elbow close to torso. Full extension at bottom, squeeze at top." },
+  "T-Bar Row":              { muscles:["Back","Biceps"], desc:"Straddle the bar, hinge forward. Pull weight to chest, driving elbows high. Squeeze shoulder blades at top. Keep back flat throughout." },
+  "Inverted Row":           { muscles:["Back","Biceps","Rear Deltoids"], desc:"Hang below a bar with straight body. Pull chest to bar, driving elbows back. The more horizontal your body, the harder the exercise." },
+  "Power Clean":            { muscles:["Full Body","Traps","Glutes","Hamstrings"], desc:"Pull bar from floor explosively, then drop under it and catch in a front rack position. Requires coordinated triple extension of ankles, knees, and hips. High skill, high reward." },
+  "Barbell Curl":           { muscles:["Biceps","Brachialis"], desc:"Grip bar shoulder-width, elbows pinned at sides. Curl bar to shoulder height, squeeze at top. Lower slowly. Avoid swinging your torso." },
+  "Hammer Curl":            { muscles:["Biceps","Brachialis","Brachioradialis"], desc:"Neutral grip (palms facing each other). Curl weight to shoulder without rotating the wrist. Hits the brachialis and forearms harder than supinated curls." },
+  "Incline DB Curl":        { muscles:["Biceps (Long Head)"], desc:"Set bench to 45-60°. Let arms hang straight down. Curl from full stretch — this elongated starting position maximally targets the long head of the bicep." },
+  "Cable Curl":             { muscles:["Biceps"], desc:"Stand at low cable pulley. Curl handle to shoulder height, keeping elbows stationary. Cables maintain constant tension throughout the full range of motion." },
+  "EZ Bar Curl":            { muscles:["Biceps","Brachialis"], desc:"Use angled grip of EZ bar to reduce wrist strain. Curl with elbows pinned, lower slowly. Slightly easier on the wrists than straight bar." },
+  "Concentration Curl":     { muscles:["Biceps (Peak)"], desc:"Seated, elbow resting on inner thigh. Curl dumbbell to shoulder, supinate at the top. Isolation exercise — great for developing peak." },
+  "Squat":                  { muscles:["Quads","Glutes","Hamstrings","Core"], desc:"Bar on upper traps, shoulder-width stance. Break at hips and knees simultaneously. Descend until thighs are parallel or below. Drive through the floor to stand." },
+  "Leg Press":              { muscles:["Quads","Glutes","Hamstrings"], desc:"Feet shoulder-width on platform. Lower sled until knees are at ~90°, then press back to near lockout. Do not lock out completely. Adjust foot position to bias quads (low) or glutes (high)." },
+  "Bulgarian Split Squat":  { muscles:["Quads","Glutes","Hamstrings"], desc:"Rear foot elevated on bench, front foot forward. Lower rear knee toward floor, keeping front shin vertical. Drive through front heel to stand." },
+  "Goblet Squat":           { muscles:["Quads","Glutes","Core"], desc:"Hold dumbbell or kettlebell at chest height. Squat deep, keeping torso upright and elbows inside knees. Great for quad development and mobility." },
+  "Leg Extension":          { muscles:["Quads"], desc:"Seated in machine, pad across lower shins. Extend legs to full lockout, squeeze quads hard at the top, then lower under control. Isolation movement." },
+  "Hack Squat":             { muscles:["Quads","Glutes"], desc:"Feet shoulder-width on platform, back flat against pad. Lower until thighs are parallel, then drive through heels to return. More quad-dominant than regular squat." },
+  "Walking Lunges":         { muscles:["Quads","Glutes","Hamstrings"], desc:"Step forward into a lunge, lower rear knee close to floor, then drive front foot forward to bring feet together and repeat with other leg. Keep torso upright." },
+  "Step-Ups":               { muscles:["Quads","Glutes"], desc:"Step one foot fully onto a box or bench. Drive through that heel to lift your body up. Don't push off with the trailing foot. Step down with control." },
+  "Romanian Deadlift":      { muscles:["Hamstrings","Glutes","Erectors"], desc:"Hinge forward with soft knees, pushing hips back. Bar stays close to legs. Lower until you feel a strong hamstring stretch, then drive hips forward to stand." },
+  "Leg Curl":               { muscles:["Hamstrings"], desc:"Lie prone in machine, pad against lower calves. Curl legs toward glutes, squeezing hamstrings at the top. Lower slowly under tension." },
+  "Nordic Curl":            { muscles:["Hamstrings"], desc:"Kneel with ankles anchored. Slowly lower your torso toward the floor by extending at the knees, resisting with hamstrings. Push up with hands then pull back with hamstrings." },
+  "Hip Thrust":             { muscles:["Glutes","Hamstrings"], desc:"Upper back on bench, bar across hips. Plant feet flat. Drive hips up explosively to full extension, squeezing glutes hard at the top. Lower under control." },
+  "Glute Bridge":           { muscles:["Glutes","Hamstrings"], desc:"Lie on your back, feet flat on floor. Drive hips up by squeezing glutes, hold at the top, then lower. Bodyweight or add a plate across hips." },
+  "Sumo Deadlift":          { muscles:["Glutes","Inner Thighs","Hamstrings","Back"], desc:"Wide stance, toes flared out. Grip bar between legs, narrower than conventional. Push knees out and drive hips through to lock out. Less lower back, more glutes/hips." },
+  "Calf Raises":            { muscles:["Gastrocnemius","Soleus"], desc:"Stand on edge of a step or plate, heels hanging. Rise onto toes as high as possible, squeeze at top, then lower into a stretch below parallel. Full range of motion is key." },
+  "Seated Calf Raise":      { muscles:["Soleus"], desc:"Seated with pad across lower thighs. Rise onto toes and squeeze, then lower to full stretch. Seated position targets the soleus (the deeper calf muscle) more than standing." },
+  "Box Jump":               { muscles:["Quads","Glutes","Calves"], desc:"Stand facing box, slight dip then explode upward. Land softly with both feet flat on the box, knees tracking over toes. Step down rather than jumping down." },
+  "Kettlebell Swing":       { muscles:["Posterior Chain","Glutes","Hamstrings","Core"], desc:"Hip hinge to load the hamstrings, then explosively extend hips to swing the bell to chest height. It is a hip hinge, not a squat — keep back flat and shins vertical." },
+  "Plank":                  { muscles:["Core","Transverse Abdominis","Shoulders"], desc:"Forearms and toes on the floor, body in a straight line. Brace your abs as if taking a punch, squeeze glutes. Breathe steadily. Do not let hips sag or rise." },
+  "Hanging Leg Raise":      { muscles:["Core","Hip Flexors"], desc:"Dead hang from a bar. Raise straight legs (or bent knees) to hip height or above. Control the lowering phase — do not swing. Brace core throughout." },
+  "DB Shrug":               { muscles:["Trapezius"], desc:"Hold dumbbells at sides. Shrug shoulders straight up toward ears as high as possible, hold briefly at the top, then lower slowly. No rolling — straight up and down." },
+  "Barbell Shrug":          { muscles:["Trapezius"], desc:"Hold bar in front with overhand grip. Shrug straight up maximally, hold for a count, lower with control. Can handle heavy loads for trap development." },
+  "Farmer Carry":           { muscles:["Traps","Core","Forearms","Glutes"], desc:"Hold heavy dumbbells or kettlebells at sides. Walk for the prescribed distance with tall posture, braced core, and relaxed shoulders. A full-body loaded carry." },
+  "Face Pulls":             { muscles:["Rear Deltoids","Rotator Cuff","Traps"], desc:"Rope attachment at head height. Pull toward your face, flaring elbows wide and high. Externally rotate at the end position. Critical for shoulder health and posture." },
+  "Band Pull-Apart":        { muscles:["Rear Deltoids","Rotator Cuff"], desc:"Hold band at chest height with arms extended. Pull band apart until arms are wide, squeezing rear delts and pinching shoulder blades. Control the return." },
 };
 
 const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!exerciseName) return;
-    setLoading(true);
-    setData(null);
-
-    const fetchInfo = async () => {
-      const BASE = "https://wger.de";
-      let baseId = WGER_IDS[exerciseName] || null;
-      let desc = "";
-      let muscles = [];
-      let images = [];
-
-      try {
-        // If no known ID, try search
-        if (!baseId) {
-          const searchRes = await fetch(
-            `${BASE}/api/v2/exercise/search/?term=${encodeURIComponent(exerciseName)}&language=english&format=json`
-          );
-          const searchData = await searchRes.json();
-          const suggestions = searchData?.suggestions || [];
-          const norm = s => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
-          const target = norm(exerciseName);
-          const match = suggestions.find(s =>
-            norm(s.value || "") === target ||
-            norm(s.value || "").includes(target) ||
-            target.includes(norm(s.value || ""))
-          );
-          baseId = match?.data?.base_id || match?.data?.id || null;
-        }
-
-        if (baseId) {
-          // Get exercise info for description + muscles
-          const infoRes = await fetch(`${BASE}/api/v2/exerciseinfo/${baseId}/?format=json`);
-          const info = await infoRes.json();
-          const engTrans = (info.translations || []).find(t => t.language === 2);
-          desc = (engTrans?.description || "").replace(/<[^>]+>/g, "").trim();
-          muscles = [
-            ...(info.muscles || []).map(m => m.name_en || m.name),
-            ...(info.muscles_secondary || []).map(m => `${m.name_en || m.name} (secondary)`),
-          ];
-
-          // Get images from exerciseimage endpoint
-          const imgRes = await fetch(
-            `${BASE}/api/v2/exerciseimage/?exercise_base=${baseId}&format=json`
-          );
-          const imgData = await imgRes.json();
-          images = (imgData.results || [])
-            .map(img => {
-              const src = img.image || "";
-              return src.startsWith("http") ? src : `${BASE}${src}`;
-            })
-            .filter(Boolean)
-            .slice(0, 2);
-        }
-      } catch (e) {
-        // Silently fall through — we'll show what we have
-      }
-
-      setData({ desc, images, muscles, found: !!baseId });
-      setLoading(false);
-    };
-
-    fetchInfo();
-  }, [exerciseName]);
+  const info = EXERCISE_INFO[exerciseName] || { muscles: [], desc: "" };
+  const gif = EXERCISE_GIF[exerciseName] || null;
+  const [gifError, setGifError] = useState(false);
 
   return (
     <>
@@ -1268,65 +1327,57 @@ const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
         </div>
 
         <div style={{ padding: "0 20px 60px" }}>
-          {loading ? (
-            <div style={{ textAlign: "center", padding: "48px 0", color: "#555" }}>
-              <div style={{ fontSize: 24, marginBottom: 10 }}>⏳</div>
-              <div style={{ fontSize: 13 }}>Loading...</div>
+          {/* GIF */}
+          {gif && !gifError ? (
+            <div style={{ marginBottom: 20, borderRadius: 16, overflow: "hidden", background: "#0a0a12" }}>
+              <img
+                src={gif}
+                alt={exerciseName}
+                onError={() => setGifError(true)}
+                style={{ width: "100%", maxHeight: 260, objectFit: "contain", display: "block" }}
+              />
             </div>
           ) : (
-            <>
-              {/* Images */}
-              {data.images.length > 0 ? (
-                <div style={{ marginBottom: 20, borderRadius: 16, overflow: "hidden", background: "#1a1a2e", display: "flex", gap: 2 }}>
-                  {data.images.map((src, i) => (
-                    <img key={i} src={src} alt={`${exerciseName} ${i + 1}`}
-                      style={{ flex: 1, width: 0, maxHeight: 240, objectFit: "cover", display: "block" }}
-                      onError={e => { e.target.style.display = "none"; }}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div style={{
-                  marginBottom: 20, borderRadius: 16,
-                  background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
-                  padding: "28px 20px", textAlign: "center",
-                }}>
-                  <div style={{ fontSize: 13, color: "#555" }}>No image available for this exercise</div>
-                </div>
-              )}
+            <div style={{
+              marginBottom: 20, borderRadius: 16,
+              background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+              padding: "28px 20px", textAlign: "center",
+            }}>
+              <div style={{ fontSize: 32, marginBottom: 8 }}>🏋️</div>
+              <div style={{ fontSize: 13, color: "#555" }}>Search "{exerciseName}" on YouTube for a video demo</div>
+            </div>
+          )}
 
-              {/* Muscles */}
-              {data.muscles.length > 0 && (
-                <div style={{ marginBottom: 16 }}>
-                  <div style={{ fontSize: 11, color: "#555", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>Muscles Worked</div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                    {data.muscles.map((m, i) => (
-                      <div key={i} style={{
-                        background: m.includes("secondary") ? "rgba(255,255,255,0.06)" : `${accentColor}18`,
-                        border: `1px solid ${m.includes("secondary") ? "rgba(255,255,255,0.1)" : accentColor + "44"}`,
-                        borderRadius: 20, padding: "5px 12px",
-                        fontSize: 12, fontWeight: 600,
-                        color: m.includes("secondary") ? "#666" : accentColor,
-                      }}>
-                        {m}
-                      </div>
-                    ))}
+          {/* Muscles */}
+          {info.muscles.length > 0 && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 11, color: "#555", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>Muscles Worked</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {info.muscles.map((m, i) => (
+                  <div key={i} style={{
+                    background: i === 0 ? `${accentColor}18` : "rgba(255,255,255,0.06)",
+                    border: `1px solid ${i === 0 ? accentColor + "44" : "rgba(255,255,255,0.1)"}`,
+                    borderRadius: 20, padding: "5px 12px",
+                    fontSize: 12, fontWeight: 600,
+                    color: i === 0 ? accentColor : "#666",
+                  }}>
+                    {m}
                   </div>
-                </div>
-              )}
+                ))}
+              </div>
+            </div>
+          )}
 
-              {/* Description */}
-              {data.desc ? (
-                <div>
-                  <div style={{ fontSize: 11, color: "#555", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>How To</div>
-                  <div style={{ fontSize: 14, color: "#aaa", lineHeight: 1.7 }}>{data.desc}</div>
-                </div>
-              ) : (
-                <div style={{ fontSize: 13, color: "#555", lineHeight: 1.6, fontStyle: "italic" }}>
-                  Search "{exerciseName}" on YouTube for a video demonstration.
-                </div>
-              )}
-            </>
+          {/* Description */}
+          {info.desc ? (
+            <div>
+              <div style={{ fontSize: 11, color: "#555", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>How To</div>
+              <div style={{ fontSize: 14, color: "#aaa", lineHeight: 1.7 }}>{info.desc}</div>
+            </div>
+          ) : (
+            <div style={{ fontSize: 13, color: "#555", lineHeight: 1.6, fontStyle: "italic" }}>
+              Search "{exerciseName}" on YouTube for a video demonstration.
+            </div>
           )}
         </div>
       </div>
@@ -1379,8 +1430,7 @@ const WorkoutScreen = ({ phase, dayKey, workoutDay, exerciseLogs, onSave, onFini
   };
 
   const getActiveEx = (idx) => swappedExercises[idx] || exercises[idx];
-  const ex = getActiveEx(currentExIdx);
-  const prevLog = getPrevLog(ex?.name);
+  const prevLog = getPrevLog(getActiveEx(currentExIdx)?.name);
 
   // ── #1 Default weight: last recorded or 50lbs ────────────────────────────
   useEffect(() => {
@@ -1390,10 +1440,17 @@ const WorkoutScreen = ({ phase, dayKey, workoutDay, exerciseLogs, onSave, onFini
     }
   }, [currentExIdx, ex?.name]);
 
+  // Guard: if exercises array is empty or currentExIdx is out of bounds, clamp safely
+  const safeIdx = Math.min(currentExIdx, Math.max(0, exercises.length - 1));
+  if (safeIdx !== currentExIdx) setCurrentExIdx(safeIdx);
+  const ex = getActiveEx(safeIdx) || exercises[0];
+
   const sets = parseInt(ex?.sets || 3);
   const completedForCurrent = (completedSets[ex?.name] || []).length;
   const w = weights[ex?.name] ?? 50;
   const r = reps[ex?.name] ?? parseInt(ex?.reps || 8);
+
+  if (!ex) return null; // Safety net — prevents blank render
 
   const handleSwap = () => {
     const original = exercises[currentExIdx];
@@ -1448,6 +1505,17 @@ const WorkoutScreen = ({ phase, dayKey, workoutDay, exerciseLogs, onSave, onFini
     } else {
       finishWorkout();
     }
+  };
+
+  const skipExercise = () => {
+    const newExercises = exercises.filter((_, i) => i !== currentExIdx);
+    if (newExercises.length === 0) {
+      if (workout.cardio.hasCardio) { setPhase("cardio"); } else { finishWorkout(); }
+      return;
+    }
+    setExercises(newExercises);
+    const newIdx = Math.min(currentExIdx, newExercises.length - 1);
+    setCurrentExIdx(newIdx);
   };
 
   const goToExercise = async (idx) => {
@@ -1695,7 +1763,7 @@ const WorkoutScreen = ({ phase, dayKey, workoutDay, exerciseLogs, onSave, onFini
       {/* Skip exercise — only show if no sets logged yet */}
       {completedForCurrent === 0 && (
         <button
-          onClick={nextExercise}
+          onClick={skipExercise}
           style={{
             width: "100%", marginTop: 8, padding: "11px",
             background: "transparent", border: "none",
