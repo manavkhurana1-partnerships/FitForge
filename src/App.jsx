@@ -695,39 +695,52 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
         {/* Today's Workout Card */}
         <div style={{ ...S.card(`${accentColor}33`), marginBottom: 16, background: `linear-gradient(135deg, rgba(0,255,136,0.05), rgba(10,10,15,1))` }}>
           {/* Workout title row */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-            <div>
-              <div style={S.tag(accentColor)}>Today's Workout</div>
-              <div style={{ fontSize: 22, fontWeight: 800, marginTop: 8, letterSpacing: "-0.01em" }}>
-                {workout.icon} {workout.name}
+          {(() => {
+            const todayWorkout = allWorkouts.find(w => w.key === dayKey) || workout;
+            const isViewingToday = activeDayKey === dayKey;
+            return (
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+                <div>
+                  <div style={S.tag(accentColor)}>Today's Workout</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, marginTop: 8, letterSpacing: "-0.01em" }}>
+                    <span style={{ padding: "2px 10px 2px 6px", borderRadius: 8, background: `${accentColor}22`, border: `1px solid ${accentColor}55` }}>
+                      {todayWorkout.icon} {todayWorkout.name}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 12, color: "#888", marginTop: 6 }}>
+                    {todayWorkout.exercises.length} exercises{todayWorkout.cardio?.hasCardio ? ` · ${todayWorkout.cardio.duration}min cardio` : ""}
+                  </div>
+                  {!isViewingToday && (
+                    <div style={{ fontSize: 11, color: "#555", marginTop: 4 }}>Previewing {workout.name}</div>
+                  )}
+                </div>
+                <div style={{ ...S.tag(todayWorkout.cardio?.type === "HIIT" ? "#ff6b35" : "#00cfff"), flexShrink: 0 }}>
+                  {todayWorkout.cardio?.type}
+                </div>
               </div>
-              <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>
-                {workout.exercises.length} exercises{workout.cardio.hasCardio ? ` · ${workout.cardio.duration}min cardio` : ""}
-              </div>
-            </div>
-            <div style={{ ...S.tag(workout.cardio.type === "HIIT" ? "#ff6b35" : "#00cfff"), flexShrink: 0 }}>
-              {workout.cardio.type}
-            </div>
-          </div>
+            );
+          })()}
 
           {/* Change workout picker */}
           <div style={{ display: "flex", gap: 6, marginBottom: 14, flexWrap: allWorkouts.length > 3 ? "wrap" : "nowrap" }}>
-            {allWorkouts.map((w, idx) => (
-              <button key={w.key} onClick={() => setActiveDayKey(w.key)} style={{
-                flex: allWorkouts.length > 3 ? "1 1 calc(50% - 3px)" : 1,
-                padding: "8px 4px", borderRadius: 10, border: "none", cursor: "pointer",
-                background: activeDayKey === w.key ? accentColor : "rgba(255,255,255,0.06)",
-                color: activeDayKey === w.key ? "#000" : "#666",
-                fontSize: 11, fontWeight: 700, transition: "all 0.2s",
-                outline: activeDayKey === w.key ? "none" : "1px solid rgba(255,255,255,0.08)",
-              }}>
-                <div style={{ fontSize: 14, marginBottom: 1 }}>{w.icon}</div>
-                <div>{w.name}</div>
-                {w.key === dayKey && (
-                  <div style={{ fontSize: 9, marginTop: 1, opacity: 0.7 }}>Today</div>
-                )}
-              </button>
-            ))}
+            {allWorkouts.map((w, idx) => {
+              const isActive = activeDayKey === w.key;
+              const isToday = w.key === dayKey;
+              return (
+                <button key={w.key} onClick={() => setActiveDayKey(w.key)} style={{
+                  flex: allWorkouts.length > 3 ? "1 1 calc(50% - 3px)" : 1,
+                  padding: "8px 4px", borderRadius: 10, border: "none", cursor: "pointer",
+                  background: isActive ? accentColor : isToday ? `${accentColor}22` : "rgba(255,255,255,0.06)",
+                  color: isActive ? "#000" : isToday ? accentColor : "#666",
+                  fontSize: 11, fontWeight: 700, transition: "all 0.2s",
+                  outline: isActive ? "none" : isToday ? `2px solid ${accentColor}88` : "1px solid rgba(255,255,255,0.08)",
+                }}>
+                  <div style={{ fontSize: 14, marginBottom: 1 }}>{w.icon}</div>
+                  <div>{w.name}</div>
+                  <div style={{ fontSize: 9, marginTop: 1, opacity: isToday ? 1 : 0, color: isActive ? "#00000088" : accentColor }}>Today</div>
+                </button>
+              );
+            })}
           </div>
           {/* Exercise list preview */}
           <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
