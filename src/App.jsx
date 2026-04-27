@@ -1430,7 +1430,12 @@ const WorkoutScreen = ({ phase, dayKey, workoutDay, exerciseLogs, onSave, onFini
   };
 
   const getActiveEx = (idx) => swappedExercises[idx] || exercises[idx];
-  const prevLog = getPrevLog(getActiveEx(currentExIdx)?.name);
+
+  // Clamp index safely — never let it go out of bounds
+  const safeIdx = exercises.length > 0 ? Math.min(currentExIdx, exercises.length - 1) : 0;
+  const ex = getActiveEx(safeIdx) || exercises[0] || null;
+
+  const prevLog = getPrevLog(ex?.name);
 
   // ── #1 Default weight: last recorded or 50lbs ────────────────────────────
   useEffect(() => {
@@ -1440,17 +1445,19 @@ const WorkoutScreen = ({ phase, dayKey, workoutDay, exerciseLogs, onSave, onFini
     }
   }, [currentExIdx, ex?.name]);
 
-  // Guard: if exercises array is empty or currentExIdx is out of bounds, clamp safely
-  const safeIdx = Math.min(currentExIdx, Math.max(0, exercises.length - 1));
-  if (safeIdx !== currentExIdx) setCurrentExIdx(safeIdx);
-  const ex = getActiveEx(safeIdx) || exercises[0];
+  // Keep currentExIdx in sync if exercises shrink (e.g. after a skip)
+  useEffect(() => {
+    if (exercises.length > 0 && currentExIdx >= exercises.length) {
+      setCurrentExIdx(exercises.length - 1);
+    }
+  }, [exercises.length]);
 
   const sets = parseInt(ex?.sets || 3);
   const completedForCurrent = (completedSets[ex?.name] || []).length;
   const w = weights[ex?.name] ?? 50;
   const r = reps[ex?.name] ?? parseInt(ex?.reps || 8);
 
-  if (!ex) return null; // Safety net — prevents blank render
+  if (!ex) return null;
 
   const handleSwap = () => {
     const original = exercises[currentExIdx];
