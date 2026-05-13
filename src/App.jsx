@@ -3,19 +3,19 @@ import { supabase } from "./supabase";
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 const PHASES_MALE = [
-  { id: 1, name: "Hypertrophy", icon: "💪", color: "#3b82f6", desc: "Volume-focused, 8-12 reps", weeks: 4 },
-  { id: 2, name: "Strength",    icon: "🏋️", color: "#60a5fa", desc: "Heavy loads, 4-6 reps",    weeks: 4 },
-  { id: 3, name: "Power",       icon: "⚡", color: "#93c5fd", desc: "Explosive, 3-5 reps",       weeks: 4 },
+  { id: 1, name: "Hypertrophy", icon: "💪", color: "#2563EB", desc: "Volume-focused, 8-12 reps", weeks: 4 },
+  { id: 2, name: "Strength",    icon: "🏋️", color: "#0EA5E9", desc: "Heavy loads, 4-6 reps",    weeks: 4 },
+  { id: 3, name: "Power",       icon: "⚡", color: "#6366F1", desc: "Explosive, 3-5 reps",       weeks: 4 },
 ];
 const PHASES_DEFAULT = [
-  { id: 1, name: "Hypertrophy", icon: "💪", color: "#00ff88", desc: "Volume-focused, 8-12 reps", weeks: 4 },
-  { id: 2, name: "Strength",    icon: "🏋️", color: "#00cfff", desc: "Heavy loads, 4-6 reps",    weeks: 4 },
-  { id: 3, name: "Power",       icon: "⚡", color: "#ff6b35", desc: "Explosive, 3-5 reps",       weeks: 4 },
+  { id: 1, name: "Hypertrophy", icon: "💪", color: "#2563EB", desc: "Volume-focused, 8-12 reps", weeks: 4 },
+  { id: 2, name: "Strength",    icon: "🏋️", color: "#0EA5E9", desc: "Heavy loads, 4-6 reps",    weeks: 4 },
+  { id: 3, name: "Power",       icon: "⚡", color: "#6366F1", desc: "Explosive, 3-5 reps",       weeks: 4 },
 ];
 const PHASES_FEMALE = [
-  { id: 1, name: "Hypertrophy", icon: "💪", color: "#e879f9", desc: "Volume-focused, 8-12 reps", weeks: 4 },
-  { id: 2, name: "Strength",    icon: "🏋️", color: "#f472b6", desc: "Heavy loads, 4-6 reps",    weeks: 4 },
-  { id: 3, name: "Power",       icon: "⚡", color: "#fb923c", desc: "Explosive, 3-5 reps",       weeks: 4 },
+  { id: 1, name: "Hypertrophy", icon: "💪", color: "#2563EB", desc: "Volume-focused, 8-12 reps", weeks: 4 },
+  { id: 2, name: "Strength",    icon: "🏋️", color: "#0EA5E9", desc: "Heavy loads, 4-6 reps",    weeks: 4 },
+  { id: 3, name: "Power",       icon: "⚡", color: "#6366F1", desc: "Explosive, 3-5 reps",       weeks: 4 },
 ];
 const PHASES = PHASES_DEFAULT; // default palette (used for phase switcher labels in HomeScreen/ProfileScreen)
 const WORKOUT_DAYS = ["A", "B", "C", "D", "E"]; // supports up to 5-day splits
@@ -433,9 +433,9 @@ const Icon = ({ name, size = 20, color = "currentColor" }) => {
 };
 
 // ─── MINI LINE CHART ──────────────────────────────────────────────────────────
-const LineChart = ({ data, color = "#00ff88", height = 80 }) => {
+const LineChart = ({ data, color = "#2563EB", height = 80 }) => {
   if (!data || data.length < 2) return (
-    <div style={{ height, display: "flex", alignItems: "center", justifyContent: "center", color: "#555", fontSize: 13 }}>
+    <div style={{ height, display: "flex", alignItems: "center", justifyContent: "center", color: "#94A3B8", fontSize: 13 }}>
       Log at least 2 entries to see trend
     </div>
   );
@@ -467,12 +467,12 @@ const LineChart = ({ data, color = "#00ff88", height = 80 }) => {
 // ─── STYLES ───────────────────────────────────────────────────────────────────
 const S = {
   app: {
-    background: "#0a0a0f",
+    background: "#F1F5F9",
     minHeight: "100vh",
     maxWidth: 430,
     margin: "0 auto",
     fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
-    color: "#fff",
+    color: "#0F172A",
     position: "relative",
     overflowX: "hidden",
   },
@@ -489,9 +489,9 @@ const S = {
     transform: "translateX(-50%)",
     width: "100%",
     maxWidth: 430,
-    background: "rgba(15,15,22,0.97)",
+    background: "rgba(255,255,255,0.95)",
     backdropFilter: "blur(20px)",
-    borderTop: "1px solid rgba(255,255,255,0.07)",
+    borderTop: "1px solid rgba(15,23,42,0.08)",
     display: "flex",
     justifyContent: "space-around",
     padding: "10px 0 20px",
@@ -504,10 +504,10 @@ const S = {
     gap: 4,
     background: "none",
     border: "none",
-    color: active ? color : "#444",
+    color: active ? color : "#94A3B8",
     cursor: "pointer",
     fontSize: 10,
-    fontWeight: active ? 700 : 400,
+    fontWeight: active ? 700 : 500,
     letterSpacing: "0.05em",
     textTransform: "uppercase",
     transition: "all 0.2s",
@@ -515,16 +515,17 @@ const S = {
   }),
   header: {
     padding: "56px 20px 20px",
-    background: "linear-gradient(180deg, rgba(10,10,20,1) 0%, rgba(10,10,15,0) 100%)",
+    background: "linear-gradient(180deg, rgba(241,245,249,1) 0%, rgba(241,245,249,0) 100%)",
   },
-  card: (border = "transparent") => ({
-    background: "rgba(255,255,255,0.04)",
+  card: (border = "rgba(15,23,42,0.07)") => ({
+    background: "#FFFFFF",
     borderRadius: 20,
     padding: "18px 20px",
     marginBottom: 12,
     border: `1px solid ${border}`,
     position: "relative",
     overflow: "hidden",
+    boxShadow: "0 1px 4px rgba(15,23,42,0.06)",
   }),
   tag: (color) => ({
     background: color + "22",
@@ -541,21 +542,21 @@ const S = {
     width: "100%",
     padding: "18px",
     borderRadius: 16,
-    background: disabled ? "#222" : `linear-gradient(135deg, ${color}, ${color}cc)`,
-    color: disabled ? "#555" : "#000",
+    background: disabled ? "#E2E8F0" : color,
+    color: disabled ? "#94A3B8" : "#FFFFFF",
     fontSize: 17,
-    fontWeight: 800,
+    fontWeight: 700,
     border: "none",
     cursor: disabled ? "default" : "pointer",
     letterSpacing: "0.02em",
     transition: "all 0.2s",
-    boxShadow: disabled ? "none" : `0 4px 24px ${color}44`,
+    boxShadow: disabled ? "none" : `0 4px 20px ${color}44`,
   }),
   input: {
-    background: "rgba(255,255,255,0.07)",
-    border: "1px solid rgba(255,255,255,0.1)",
+    background: "#F8FAFC",
+    border: "1px solid rgba(15,23,42,0.12)",
     borderRadius: 14,
-    color: "#fff",
+    color: "#0F172A",
     fontSize: 28,
     fontWeight: 700,
     textAlign: "center",
@@ -568,7 +569,7 @@ const S = {
     display: "flex",
     alignItems: "center",
     gap: 0,
-    background: "rgba(255,255,255,0.06)",
+    background: "#F8FAFC",
     borderRadius: 14,
     overflow: "hidden",
   },
@@ -590,7 +591,7 @@ const S = {
     textAlign: "center",
     fontSize: 22,
     fontWeight: 700,
-    color: "#fff",
+    color: "#0F172A",
   },
 };
 
@@ -601,11 +602,14 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
   const allWorkouts = planDays || [];
   const workout = allWorkouts.find(d => d.key === activeDayKey) || allWorkouts[0] || { name: "Workout", icon: "⚡", exercises: [], cardio: { hasCardio: false } };
   // workoutCount comes from props
-  const thisMonthCount = exerciseLogs.filter((l) => {
-    const d = new Date(l.date);
+  const thisMonthCount = (() => {
     const now = new Date();
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-  }).map((l) => l.date).filter((v, i, a) => a.indexOf(v) === i).length;
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const dates = exerciseLogs
+      .filter(l => new Date(l.date) >= monthStart)
+      .map(l => new Date(l.date).toDateString());
+    return new Set(dates).size;
+  })();
 
   const latestWeight = weightLogs.length ? weightLogs[weightLogs.length - 1].weight_value : null;
   const progressPct = Math.min(100, Math.round((phaseDay / 30) * 100));
@@ -614,7 +618,7 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
     <div style={S.scroll}>
       {/* Header */}
       <div style={S.header}>
-        <div style={{ fontSize: 13, color: "#666", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>
+        <div style={{ fontSize: 13, color: "#94A3B8", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>
           {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
@@ -626,8 +630,8 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
           </div>
           {latestWeight && (
             <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: 11, color: "#555", textTransform: "uppercase", letterSpacing: "0.08em" }}>Weight</div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: accentColor }}>{latestWeight}<span style={{ fontSize: 13, color: "#666" }}> lbs</span></div>
+              <div style={{ fontSize: 11, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.08em" }}>Weight</div>
+              <div style={{ fontSize: 22, fontWeight: 800, color: accentColor }}>{latestWeight}<span style={{ fontSize: 13, color: "#94A3B8" }}> lbs</span></div>
             </div>
           )}
         </div>
@@ -635,18 +639,18 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
 
       <div style={{ padding: "0 16px" }}>
         {/* Phase Progress */}
-        <div style={{ ...S.card("rgba(255,255,255,0.06)"), marginBottom: 12 }}>
+        <div style={{ ...S.card("#F1F5F9"), marginBottom: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
             <div>
-              <div style={{ fontSize: 11, color: "#666", textTransform: "uppercase", letterSpacing: "0.08em" }}>Training Phase</div>
+              <div style={{ fontSize: 11, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.08em" }}>Training Phase</div>
               <div style={{ fontSize: 19, fontWeight: 800, color: phase.color, marginTop: 2 }}>{phase.name}</div>
               <div style={{ fontSize: 12, color: "#777", marginTop: 2 }}>{phase.desc}</div>
             </div>
             <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: 11, color: "#666", textTransform: "uppercase", letterSpacing: "0.08em" }}>Day</div>
-              <div style={{ fontSize: 28, fontWeight: 900, color: "#fff" }}>
+              <div style={{ fontSize: 11, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.08em" }}>Day</div>
+              <div style={{ fontSize: 28, fontWeight: 900, color: "#0F172A" }}>
                 {phaseDay > 30 ? <span style={{ color: accentColor }}>{phaseDay}</span> : phaseDay}
-                <span style={{ fontSize: 14, color: "#555" }}>/30</span>
+                <span style={{ fontSize: 14, color: "#94A3B8" }}>/30</span>
               </div>
             </div>
           </div>
@@ -660,10 +664,10 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
                 }
               }} style={{
                 flex: 1, padding: "8px 4px", borderRadius: 10, border: "none", cursor: "pointer",
-                background: i === phaseIndex ? p.color : "rgba(255,255,255,0.06)",
+                background: i === phaseIndex ? p.color : "#F1F5F9",
                 color: i === phaseIndex ? "#000" : "#666",
                 fontSize: 11, fontWeight: 700, transition: "all 0.2s",
-                outline: i === phaseIndex ? "none" : "1px solid rgba(255,255,255,0.08)",
+                outline: i === phaseIndex ? "none" : "1px solid rgba(15,23,42,0.08)",
               }}>
                 <div style={{ fontSize: 13, marginBottom: 1 }}>{p.icon || "●"}</div>
                 <div>{p.name}</div>
@@ -671,10 +675,10 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
             ))}
           </div>
           {/* Progress bar */}
-          <div style={{ background: "rgba(255,255,255,0.07)", borderRadius: 8, height: 6, overflow: "hidden" }}>
+          <div style={{ background: "#F8FAFC", borderRadius: 8, height: 6, overflow: "hidden" }}>
             <div style={{ width: `${progressPct}%`, height: "100%", background: `linear-gradient(90deg, ${phase.color}, ${phase.color}99)`, borderRadius: 8, transition: "width 0.5s ease" }} />
           </div>
-          <div style={{ fontSize: 11, color: "#555", marginTop: 6, textAlign: "right" }}>
+          <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 6, textAlign: "right" }}>
             {phaseDay >= 30 ? "Phase complete — switch when ready" : `${30 - phaseDay} days remaining`}
           </div>
         </div>
@@ -683,18 +687,18 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 12 }}>
           {[
             { label: "Sessions This Month", value: thisMonthCount, icon: "trophy", color: accentColor },
-            { label: "Total Workouts", value: workoutCount, icon: "flame", color: "#ff6b35" },
+            { label: "Total Workouts", value: workoutCount, icon: "flame", color: "#DC2626" },
           ].map((stat) => (
             <div key={stat.label} style={{ ...S.card(), textAlign: "center", marginBottom: 0 }}>
               <Icon name={stat.icon} size={22} color={stat.color} />
-              <div style={{ fontSize: 26, fontWeight: 900, color: "#fff", margin: "6px 0 2px" }}>{stat.value}</div>
-              <div style={{ fontSize: 11, color: "#666", lineHeight: 1.3 }}>{stat.label}</div>
+              <div style={{ fontSize: 26, fontWeight: 900, color: "#0F172A", margin: "6px 0 2px" }}>{stat.value}</div>
+              <div style={{ fontSize: 11, color: "#94A3B8", lineHeight: 1.3 }}>{stat.label}</div>
             </div>
           ))}
         </div>
 
         {/* Today's Workout Card */}
-        <div style={{ ...S.card(`${accentColor}33`), marginBottom: 16, background: `linear-gradient(135deg, rgba(0,255,136,0.05), rgba(10,10,15,1))` }}>
+        <div style={{ ...S.card(`${accentColor}33`), marginBottom: 16, background: `linear-gradient(135deg, rgba(37,99,235,0.03), rgba(10,10,15,1))` }}>
           {/* Workout title row */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
             <div>
@@ -702,11 +706,11 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
               <div style={{ fontSize: 22, fontWeight: 800, marginTop: 8, letterSpacing: "-0.01em" }}>
                 {workout.icon} {workout.name}
               </div>
-              <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>
+              <div style={{ fontSize: 12, color: "#94A3B8", marginTop: 4 }}>
                 {workout.exercises.length} exercises{workout.cardio.hasCardio ? ` · ${workout.cardio.duration}min cardio` : ""}
               </div>
             </div>
-            <div style={{ ...S.tag(workout.cardio.type === "HIIT" ? "#ff6b35" : "#00cfff"), flexShrink: 0 }}>
+            <div style={{ ...S.tag(workout.cardio.type === "HIIT" ? "#DC2626" : "#0EA5E9"), flexShrink: 0 }}>
               {workout.cardio.type}
             </div>
           </div>
@@ -720,10 +724,10 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
                 <button key={w.key} onClick={() => setActiveDayKey(w.key)} style={{
                   flex: allWorkouts.length > 3 ? "1 1 calc(50% - 3px)" : 1,
                   padding: "8px 4px", borderRadius: 10, border: "none", cursor: "pointer",
-                  background: isActive ? accentColor : isToday ? `${accentColor}22` : "rgba(255,255,255,0.06)",
+                  background: isActive ? accentColor : isToday ? `${accentColor}22` : "#F1F5F9",
                   color: isActive ? "#000" : isToday ? accentColor : "#666",
                   fontSize: 11, fontWeight: 700, transition: "all 0.2s",
-                  outline: isActive ? "none" : isToday ? `2px solid ${accentColor}88` : "1px solid rgba(255,255,255,0.08)",
+                  outline: isActive ? "none" : isToday ? `2px solid ${accentColor}88` : "1px solid rgba(15,23,42,0.08)",
                 }}>
                   <div style={{ fontSize: 14, marginBottom: 1 }}>{w.icon}</div>
                   <div>{w.name}</div>
@@ -740,14 +744,14 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
                   <div style={{ width: 28, height: 28, borderRadius: 8, background: `${accentColor}22`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: accentColor }}>{i + 1}</div>
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 600 }}>{ex.name}</div>
-                    <div style={{ fontSize: 11, color: "#666" }}>{ex.muscle}</div>
+                    <div style={{ fontSize: 11, color: "#94A3B8" }}>{ex.muscle}</div>
                   </div>
                 </div>
-                <div style={{ fontSize: 12, color: "#888" }}>{ex.sets}×{ex.reps}</div>
+                <div style={{ fontSize: 12, color: "#94A3B8" }}>{ex.sets}×{ex.reps}</div>
               </div>
             ))}
             {workout.exercises.length > 3 && (
-              <div style={{ fontSize: 12, color: "#666", textAlign: "center", paddingTop: 4 }}>
+              <div style={{ fontSize: 12, color: "#94A3B8", textAlign: "center", paddingTop: 4 }}>
                 +{workout.exercises.length - 3} more exercises
               </div>
             )}
@@ -758,7 +762,7 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
           </button>
           <button onClick={onEditPrefs} style={{
             width: "100%", marginTop: 8, padding: "10px", borderRadius: 12, border: "none",
-            background: "transparent", color: "#555", fontSize: 12, cursor: "pointer",
+            background: "transparent", color: "#94A3B8", fontSize: 12, cursor: "pointer",
           }}>
             ✏️ Edit goals & equipment
           </button>
@@ -767,12 +771,12 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
         {/* Cardio info */}
         {workout.cardio.hasCardio ? (
           <div style={{ ...S.card(), display: "flex", alignItems: "center", gap: 14, marginBottom: 0 }}>
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: `${workout.cardio.type === "HIIT" ? "#ff6b35" : "#00cfff"}22`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Icon name="bolt" size={22} color={workout.cardio.type === "HIIT" ? "#ff6b35" : "#00cfff"} />
+            <div style={{ width: 44, height: 44, borderRadius: 12, background: `${workout.cardio.type === "HIIT" ? "#DC2626" : "#0EA5E9"}22`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Icon name="bolt" size={22} color={workout.cardio.type === "HIIT" ? "#DC2626" : "#0EA5E9"} />
             </div>
             <div>
               <div style={{ fontSize: 13, fontWeight: 700 }}>Cardio Finisher · {workout.cardio.duration} min</div>
-              <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>{workout.cardio.desc}</div>
+              <div style={{ fontSize: 12, color: "#94A3B8", marginTop: 2 }}>{workout.cardio.desc}</div>
             </div>
           </div>
         ) : (
@@ -781,8 +785,8 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
               <Icon name="bolt" size={22} color="#555" />
             </div>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#888" }}>No Cardio Today</div>
-              <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>Lifting only — recover and grow.</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#94A3B8" }}>No Cardio Today</div>
+              <div style={{ fontSize: 12, color: "#94A3B8", marginTop: 2 }}>Lifting only — recover and grow.</div>
             </div>
           </div>
         )}
@@ -884,22 +888,22 @@ const RestTimer = ({ onDone, accentColor }) => {
       display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
       gap: 20,
     }}>
-      <div style={{ fontSize: 13, color: "#666", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+      <div style={{ fontSize: 13, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.1em" }}>
         {done ? "Rest Complete!" : "Rest Timer"}
       </div>
       <svg width={120} height={120} viewBox="0 0 100 100">
         <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={6}/>
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke={done ? "#00ff88" : accentColor} strokeWidth={6}
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke={done ? "#2563EB" : accentColor} strokeWidth={6}
           strokeDasharray={circ} strokeDashoffset={circ * (1 - pct)}
           strokeLinecap="round" transform="rotate(-90 50 50)"
           style={{ transition: "stroke-dashoffset 0.25s linear" }}/>
         <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central"
-          fill={done ? "#00ff88" : "#fff"} fontSize={done ? 14 : 22} fontWeight={800}>
+          fill={done ? "#2563EB" : "#fff"} fontSize={done ? 14 : 22} fontWeight={800}>
           {done ? "GO!" : `${seconds}s`}
         </text>
       </svg>
       <button onClick={handleDone} style={{
-        background: done ? "#00ff88" : "rgba(255,255,255,0.1)",
+        background: done ? "#2563EB" : "rgba(15,23,42,0.08)",
         border: "none", borderRadius: 14, padding: "14px 32px",
         color: done ? "#000" : "#aaa", fontSize: 15, fontWeight: 700, cursor: "pointer",
       }}>
@@ -954,11 +958,11 @@ const AddExercisePanel = ({ workout, onAdd, onClose, accentColor }) => {
   if (!candidates.length) {
     return (
       <>
-        <div onClick={onClose} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.7)", zIndex:200, backdropFilter:"blur(4px)" }}/>
+        <div onClick={onClose} style={{ position:"fixed", inset:0, background:"rgba(15,23,42,0.55)", zIndex:200, backdropFilter:"blur(4px)" }}/>
         <div style={{
           position:"fixed", bottom:0, left:"50%", transform:"translateX(-50%)",
-          width:"100%", maxWidth:430, background:"#111118",
-          borderRadius:"24px 24px 0 0", border:"1px solid rgba(255,255,255,0.1)",
+          width:"100%", maxWidth:430, background:"#FFFFFF",
+          borderRadius:"24px 24px 0 0", border:"1px solid rgba(15,23,42,0.12)",
           borderBottom:"none", zIndex:201, padding:"32px 24px 48px", textAlign:"center",
         }}>
           <div style={{ fontSize:32, marginBottom:12 }}>✅</div>
@@ -979,18 +983,18 @@ const AddExercisePanel = ({ workout, onAdd, onClose, accentColor }) => {
   };
 
   const stepStyle = (color) => ({
-    background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)",
+    background: "#F8FAFC", border: "1px solid rgba(255,255,255,0.12)",
     borderRadius: 12, width: 48, height: 48, display: "flex", alignItems: "center",
     justifyContent: "center", cursor: "pointer", flexShrink: 0, color,
   });
 
   return (
     <>
-      <div onClick={onClose} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.7)", zIndex:200, backdropFilter:"blur(4px)" }}/>
+      <div onClick={onClose} style={{ position:"fixed", inset:0, background:"rgba(15,23,42,0.55)", zIndex:200, backdropFilter:"blur(4px)" }}/>
       <div style={{
         position:"fixed", bottom:0, left:"50%", transform:"translateX(-50%)",
-        width:"100%", maxWidth:430, background:"#111118",
-        borderRadius:"24px 24px 0 0", border:"1px solid rgba(255,255,255,0.1)",
+        width:"100%", maxWidth:430, background:"#FFFFFF",
+        borderRadius:"24px 24px 0 0", border:"1px solid rgba(15,23,42,0.12)",
         borderBottom:"none", zIndex:201, padding:"0 0 44px",
       }}>
         {/* Handle */}
@@ -1076,7 +1080,7 @@ const AddExercisePanel = ({ workout, onAdd, onClose, accentColor }) => {
             style={{
               width:"100%", padding:"16px", borderRadius:16, border:"none",
               background: added ? "#1a3a2a" : accentColor,
-              color: added ? "#00ff88" : "#000",
+              color: added ? "#2563EB" : "#000",
               fontSize:16, fontWeight:800, cursor: added ? "default" : "pointer",
               transition:"all 0.3s",
             }}
@@ -1110,7 +1114,7 @@ const CelebrationScreen = ({ celebration, accentColor, onDone }) => {
         minHeight: "100vh", display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center",
         padding: 32, textAlign: "center", cursor: "pointer",
-        background: "radial-gradient(ellipse at center, rgba(0,255,136,0.08) 0%, #0a0a0f 70%)",
+        background: "radial-gradient(ellipse at center, rgba(37,99,235,0.05) 0%, #0a0a0f 70%)",
       }}
     >
       {/* Emojis */}
@@ -1135,7 +1139,7 @@ const CelebrationScreen = ({ celebration, accentColor, onDone }) => {
 
       {/* Message */}
       <div style={{
-        fontSize: 16, color: "#888", marginBottom: 64, lineHeight: 1.7, maxWidth: 280,
+        fontSize: 16, color: "#94A3B8", marginBottom: 64, lineHeight: 1.7, maxWidth: 280,
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0)" : "translateY(16px)",
         transition: "opacity 0.5s ease 0.45s, transform 0.5s ease 0.45s",
@@ -1153,7 +1157,7 @@ const CelebrationScreen = ({ celebration, accentColor, onDone }) => {
         <button style={S.bigBtn(accentColor)} onClick={onDone}>
           Back to Dashboard
         </button>
-        <div style={{ fontSize: 12, color: "#555", marginTop: 12 }}>
+        <div style={{ fontSize: 12, color: "#94A3B8", marginTop: 12 }}>
           Tap anywhere to continue
         </div>
       </div>
@@ -1166,87 +1170,89 @@ const CelebrationScreen = ({ celebration, accentColor, onDone }) => {
 // Fully static — no API calls. Images from yuhonas/free-exercise-db (public domain).
 // URL pattern: https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/{Folder}/0.jpg
 const RAW = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises";
-const EXERCISE_GIF = {
-  "Bench Press":              `${RAW}/Barbell_Bench_Press/0.jpg`,
-  "Incline DB Press":         `${RAW}/Incline_Dumbbell_Press/0.jpg`,
-  "DB Flat Press":            `${RAW}/Dumbbell_Bench_Press/0.jpg`,
-  "Push-Ups":                 `${RAW}/Pushup/0.jpg`,
-  "Cable Crossover":          `${RAW}/Cable_Crossover/0.jpg`,
-  "Machine Chest Press":      `${RAW}/Chest_Press/0.jpg`,
-  "Dips":                     `${RAW}/Dips_-_Chest_Version/0.jpg`,
-  "Close-Grip Push-Ups":      `${RAW}/Close-Grip_Push-Up/0.jpg`,
-  "Diamond Push-Ups":         `${RAW}/Close-Grip_Push-Up/0.jpg`,
-  "Floor Press":              `${RAW}/Barbell_Floor_Press/0.jpg`,
-  "Overhead Press":           `${RAW}/Barbell_Shoulder_Press/0.jpg`,
-  "DB Shoulder Press":        `${RAW}/Dumbbell_Shoulder_Press/0.jpg`,
-  "Lateral Raises":           `${RAW}/Side_Lateral_Raise/0.jpg`,
-  "Push Press":               `${RAW}/Push_Press/0.jpg`,
-  "Arnold Press":             `${RAW}/Arnold_Press/0.jpg`,
-  "Face Pulls":               `${RAW}/Face_Pull/0.jpg`,
-  "DB Front Raise":           `${RAW}/Dumbbell_Front_Raise/0.jpg`,
-  "DB Upright Row":           `${RAW}/Upright_Row_-_With_Bands/0.jpg`,
-  "Band Pull-Apart":          `${RAW}/Band_Pull_Apart/0.jpg`,
-  "Cable Tricep Pushdown":    `${RAW}/Pushdown/0.jpg`,
-  "Rope Pushdown":            `${RAW}/Triceps_Pushdown/0.jpg`,
-  "Skull Crushers":           `${RAW}/Barbell_Skullcrusher/0.jpg`,
-  "Overhead Tricep Extension":`${RAW}/Dumbbell_Tricep_Overhead_Extension_Two_Arm/0.jpg`,
-  "DB Kickback":              `${RAW}/Dumbbell_Kickback/0.jpg`,
-  "Close-Grip Bench":         `${RAW}/Close-Grip_Barbell_Bench_Press/0.jpg`,
-  "Diamond Push-Ups":         `${RAW}/Close-Grip_Push-Up/0.jpg`,
-  "Deadlift":                 `${RAW}/Barbell_Deadlift/0.jpg`,
-  "Trap Bar Deadlift":        `${RAW}/Trap_Bar_Deadlift/0.jpg`,
-  "Barbell Row":              `${RAW}/Bent_Over_Barbell_Row/0.jpg`,
-  "Pendlay Row":              `${RAW}/Pendlay_Row/0.jpg`,
-  "Pull-Ups":                 `${RAW}/Pull-up/0.jpg`,
-  "Weighted Pull-Ups":        `${RAW}/Pull-up/0.jpg`,
-  "Lat Pulldown":             `${RAW}/Wide-Grip_Lat_Pulldown/0.jpg`,
-  "Cable Row":                `${RAW}/Seated_Cable_Rows/0.jpg`,
-  "DB Row":                   `${RAW}/Bent_Over_Two-Dumbbell_Row/0.jpg`,
-  "T-Bar Row":                `${RAW}/T-Bar_Row_with_Handle/0.jpg`,
-  "Chest-Supported Row":      `${RAW}/Bent_Over_Two-Dumbbell_Row/0.jpg`,
-  "Inverted Row":             `${RAW}/Inverted_Row_with_Straps/0.jpg`,
-  "Power Clean":              `${RAW}/Power_Clean/0.jpg`,
-  "Straight-Arm Pushdown":    `${RAW}/Straight-Arm_Pulldown/0.jpg`,
-  "Barbell Curl":             `${RAW}/Barbell_Curl/0.jpg`,
-  "Hammer Curl":              `${RAW}/Hammer_Curls/0.jpg`,
-  "Incline DB Curl":          `${RAW}/Alternate_Incline_Dumbbell_Curl/0.jpg`,
-  "Cable Curl":               `${RAW}/Cable_Hammer_Curls_-_Rope_Attachment/0.jpg`,
-  "Preacher Curl":            `${RAW}/Barbell_Preacher_Curl/0.jpg`,
-  "EZ Bar Curl":              `${RAW}/EZ-Bar_Curl/0.jpg`,
-  "Concentration Curl":       `${RAW}/Concentration_Curls/0.jpg`,
-  "DB Shrug":                 `${RAW}/Dumbbell_Shrug/0.jpg`,
-  "Barbell Shrug":            `${RAW}/Barbell_Shrug/0.jpg`,
-  "Farmer Carry":             `${RAW}/Farmers_Walk/0.jpg`,
-  "Squat":                    `${RAW}/Barbell_Full_Squat/0.jpg`,
-  "Leg Press":                `${RAW}/Leg_Press/0.jpg`,
-  "Bulgarian Split Squat":    `${RAW}/Dumbbell_Bulgarian_Split_Squat/0.jpg`,
-  "Goblet Squat":             `${RAW}/Goblet_Squat/0.jpg`,
-  "Leg Extension":            `${RAW}/Leg_Extensions/0.jpg`,
-  "Hack Squat":               `${RAW}/Hack_Squat/0.jpg`,
-  "Box Squat":                `${RAW}/Barbell_Full_Squat/0.jpg`,
-  "Walking Lunges":           `${RAW}/Dumbbell_Walking_Lunge/0.jpg`,
-  "Step-Ups":                 `${RAW}/Barbell_Step_Ups/0.jpg`,
-  "Jump Squat":               `${RAW}/Barbell_Jump_Squat/0.jpg`,
-  "Romanian Deadlift":        `${RAW}/Romanian_Deadlift/0.jpg`,
-  "Leg Curl":                 `${RAW}/Lying_Leg_Curls/0.jpg`,
-  "Nordic Curl":              `${RAW}/Natural_Glute_Ham_Raise/0.jpg`,
-  "Stiff-Leg Deadlift":       `${RAW}/Stiff-Legged_Barbell_Deadlift/0.jpg`,
-  "Hip Thrust":               `${RAW}/Barbell_Hip_Thrust/0.jpg`,
-  "Glute Bridge":             `${RAW}/Glute_Bridge/0.jpg`,
-  "Cable Kickback":           `${RAW}/Cable_Hip_Adduction/0.jpg`,
-  "Sumo Deadlift":            `${RAW}/Sumo_Deadlift/0.jpg`,
-  "Calf Raises":              `${RAW}/Standing_Calf_Raises/0.jpg`,
-  "Seated Calf Raise":        `${RAW}/Seated_Calf_Raise/0.jpg`,
-  "Donkey Calf Raise":        `${RAW}/Donkey_Calf_Raises/0.jpg`,
-  "Single-Leg Calf Raise":    `${RAW}/Standing_Calf_Raises/0.jpg`,
-  "Box Jump":                 `${RAW}/Box_Jump/0.jpg`,
-  "Broad Jump":               `${RAW}/Broad_Jump/0.jpg`,
-  "Kettlebell Swing":         `${RAW}/Kettlebell_One-Arm_Long_Cycle/0.jpg`,
-  "DB Snatch":                `${RAW}/Dumbbell_Snatch/0.jpg`,
-  "Medicine Ball Slam":       `${RAW}/Overhead_Slam/0.jpg`,
-  "Plank":                    `${RAW}/Plank/0.jpg`,
-  "Ab Wheel Rollout":         `${RAW}/Ab_Roller/0.jpg`,
-  "Hanging Leg Raise":        `${RAW}/Hanging_Leg_Raise/0.jpg`,
+// Each exercise gets [start, end] images — step-by-step view in the modal
+const imgs = (folder, count = 2) => Array.from({ length: count }, (_, i) => `${RAW}/${folder}/${i}.jpg`);
+const EXERCISE_IMGS = {
+  "Bench Press":              imgs("Barbell_Bench_Press"),
+  "Incline DB Press":         imgs("Incline_Dumbbell_Press"),
+  "DB Flat Press":            imgs("Dumbbell_Bench_Press"),
+  "Push-Ups":                 imgs("Pushup"),
+  "Cable Crossover":          imgs("Cable_Crossover"),
+  "Machine Chest Press":      imgs("Chest_Press"),
+  "Dips":                     imgs("Dips_-_Chest_Version"),
+  "Close-Grip Push-Ups":      imgs("Close-Grip_Push-Up"),
+  "Diamond Push-Ups":         imgs("Close-Grip_Push-Up"),
+  "Floor Press":              imgs("Barbell_Floor_Press"),
+  "Overhead Press":           imgs("Barbell_Shoulder_Press"),
+  "DB Shoulder Press":        imgs("Dumbbell_Shoulder_Press"),
+  "Lateral Raises":           imgs("Side_Lateral_Raise"),
+  "Push Press":               imgs("Push_Press"),
+  "Arnold Press":             imgs("Arnold_Press"),
+  "Face Pulls":               imgs("Face_Pull"),
+  "DB Front Raise":           imgs("Dumbbell_Front_Raise"),
+  "DB Upright Row":           imgs("Upright_Row_-_With_Bands"),
+  "Band Pull-Apart":          imgs("Band_Pull_Apart"),
+  "Cable Tricep Pushdown":    imgs("Pushdown"),
+  "Rope Pushdown":            imgs("Triceps_Pushdown"),
+  "Skull Crushers":           imgs("Barbell_Skullcrusher"),
+  "Overhead Tricep Extension":imgs("Dumbbell_Tricep_Overhead_Extension_Two_Arm"),
+  "DB Kickback":              imgs("Dumbbell_Kickback"),
+  "Close-Grip Bench":         imgs("Close-Grip_Barbell_Bench_Press"),
+  "Diamond Push-Ups":         imgs("Close-Grip_Push-Up"),
+  "Deadlift":                 imgs("Barbell_Deadlift"),
+  "Trap Bar Deadlift":        imgs("Trap_Bar_Deadlift"),
+  "Barbell Row":              imgs("Bent_Over_Barbell_Row"),
+  "Pendlay Row":              imgs("Pendlay_Row"),
+  "Pull-Ups":                 imgs("Pull-up"),
+  "Weighted Pull-Ups":        imgs("Pull-up"),
+  "Lat Pulldown":             imgs("Wide-Grip_Lat_Pulldown"),
+  "Cable Row":                imgs("Seated_Cable_Rows"),
+  "DB Row":                   imgs("Bent_Over_Two-Dumbbell_Row"),
+  "T-Bar Row":                imgs("T-Bar_Row_with_Handle"),
+  "Chest-Supported Row":      imgs("Bent_Over_Two-Dumbbell_Row"),
+  "Inverted Row":             imgs("Inverted_Row_with_Straps"),
+  "Power Clean":              imgs("Power_Clean"),
+  "Straight-Arm Pushdown":    imgs("Straight-Arm_Pulldown"),
+  "Barbell Curl":             imgs("Barbell_Curl"),
+  "Hammer Curl":              imgs("Hammer_Curls"),
+  "Incline DB Curl":          imgs("Alternate_Incline_Dumbbell_Curl"),
+  "Cable Curl":               imgs("Cable_Hammer_Curls_-_Rope_Attachment"),
+  "Preacher Curl":            imgs("Barbell_Preacher_Curl"),
+  "EZ Bar Curl":              imgs("EZ-Bar_Curl"),
+  "Concentration Curl":       imgs("Concentration_Curls"),
+  "DB Shrug":                 imgs("Dumbbell_Shrug"),
+  "Barbell Shrug":            imgs("Barbell_Shrug"),
+  "Farmer Carry":             imgs("Farmers_Walk"),
+  "Squat":                    imgs("Barbell_Full_Squat"),
+  "Leg Press":                imgs("Leg_Press"),
+  "Bulgarian Split Squat":    imgs("Dumbbell_Bulgarian_Split_Squat"),
+  "Goblet Squat":             imgs("Goblet_Squat"),
+  "Leg Extension":            imgs("Leg_Extensions"),
+  "Hack Squat":               imgs("Hack_Squat"),
+  "Box Squat":                imgs("Barbell_Full_Squat"),
+  "Walking Lunges":           imgs("Dumbbell_Walking_Lunge"),
+  "Step-Ups":                 imgs("Barbell_Step_Ups"),
+  "Jump Squat":               imgs("Barbell_Jump_Squat"),
+  "Romanian Deadlift":        imgs("Romanian_Deadlift"),
+  "Leg Curl":                 imgs("Lying_Leg_Curls"),
+  "Nordic Curl":              imgs("Natural_Glute_Ham_Raise"),
+  "Stiff-Leg Deadlift":       imgs("Stiff-Legged_Barbell_Deadlift"),
+  "Hip Thrust":               imgs("Barbell_Hip_Thrust"),
+  "Glute Bridge":             imgs("Glute_Bridge"),
+  "Cable Kickback":           imgs("Cable_Hip_Adduction"),
+  "Sumo Deadlift":            imgs("Sumo_Deadlift"),
+  "Calf Raises":              imgs("Standing_Calf_Raises"),
+  "Seated Calf Raise":        imgs("Seated_Calf_Raise"),
+  "Donkey Calf Raise":        imgs("Donkey_Calf_Raises"),
+  "Single-Leg Calf Raise":    imgs("Standing_Calf_Raises"),
+  "Box Jump":                 imgs("Box_Jump"),
+  "Broad Jump":               imgs("Broad_Jump"),
+  "Kettlebell Swing":         imgs("Kettlebell_One-Arm_Long_Cycle"),
+  "DB Snatch":                imgs("Dumbbell_Snatch"),
+  "Medicine Ball Slam":       imgs("Overhead_Slam"),
+  "Plank":                    imgs("Plank"),
+  "Ab Wheel Rollout":         imgs("Ab_Roller"),
+  "Hanging Leg Raise":        imgs("Hanging_Leg_Raise"),
 };
 
 const EXERCISE_INFO = {
@@ -1318,72 +1324,84 @@ const EXERCISE_INFO = {
 
 const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
   const info = EXERCISE_INFO[exerciseName] || { muscles: [], desc: "" };
-  const gif = EXERCISE_GIF[exerciseName] || null;
-  const [gifError, setGifError] = useState(false);
+  const imgs_list = EXERCISE_IMGS[exerciseName] || [];
+  const [failedImgs, setFailedImgs] = useState({});
 
   return (
     <>
       <div onClick={onClose} style={{
-        position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
+        position: "fixed", inset: 0, background: "rgba(15,23,42,0.6)",
         zIndex: 500, backdropFilter: "blur(6px)",
       }} />
       <div style={{
         position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)",
-        width: "100%", maxWidth: 430, background: "#13131a",
-        borderRadius: "24px 24px 0 0", border: "1px solid rgba(255,255,255,0.1)",
+        width: "100%", maxWidth: 430, background: "#FFFFFF",
+        borderRadius: "24px 24px 0 0", border: "1px solid rgba(15,23,42,0.12)",
         borderBottom: "none", zIndex: 501,
         height: "85vh", overflowY: "scroll",
         WebkitOverflowScrolling: "touch", touchAction: "pan-y",
       }}>
         {/* Handle */}
         <div style={{ display: "flex", justifyContent: "center", padding: "14px 0 0" }}>
-          <div style={{ width: 40, height: 4, borderRadius: 2, background: "#333" }} />
+          <div style={{ width: 40, height: 4, borderRadius: 2, background: "#CBD5E1" }} />
         </div>
 
         {/* Header */}
         <div style={{ padding: "12px 20px 16px", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div style={{ flex: 1, paddingRight: 12 }}>
-            <div style={{ fontSize: 11, color: "#555", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Exercise Guide</div>
+            <div style={{ fontSize: 11, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Exercise Guide</div>
             <div style={{ fontSize: 20, fontWeight: 800, lineHeight: 1.2 }}>{exerciseName}</div>
           </div>
           <button onClick={onClose} style={{
-            background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 10,
+            background: "rgba(15,23,42,0.06)", border: "none", borderRadius: 10,
             width: 36, height: 36, display: "flex", alignItems: "center",
-            justifyContent: "center", cursor: "pointer", color: "#888", fontSize: 18, flexShrink: 0,
+            justifyContent: "center", cursor: "pointer", color: "#94A3B8", fontSize: 18, flexShrink: 0,
           }}>✕</button>
         </div>
 
         <div style={{ padding: "0 20px 60px" }}>
-          {/* GIF */}
-          {gif && !gifError ? (
-            <div style={{ marginBottom: 20, borderRadius: 16, overflow: "hidden", background: "#0a0a12" }}>
-              <img
-                src={gif}
-                alt={exerciseName}
-                onError={() => setGifError(true)}
-                style={{ width: "100%", maxHeight: 260, objectFit: "contain", display: "block" }}
-              />
+          {/* Step-by-step photos */}
+          {imgs_list.length > 0 ? (
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 11, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>Step by Step</div>
+              <div style={{ display: "flex", gap: 8 }}>
+                {imgs_list.map((src, i) => (
+                  failedImgs[i] ? null : (
+                    <div key={i} style={{ flex: 1, borderRadius: 14, overflow: "hidden", background: "#F1F5F9", position: "relative" }}>
+                      <div style={{ position: "absolute", top: 6, left: 6, background: "rgba(15,23,42,0.55)", borderRadius: 6, padding: "2px 7px", fontSize: 10, fontWeight: 700, color: "#0F172A", zIndex: 1 }}>
+                        {i === 0 ? "Start" : i === imgs_list.length - 1 ? "End" : `Step ${i + 1}`}
+                      </div>
+                      <img
+                        src={src}
+                        alt={`${exerciseName} step ${i + 1}`}
+                        onError={() => setFailedImgs(f => ({ ...f, [i]: true }))}
+                        style={{ width: "100%", height: 160, objectFit: "cover", display: "block" }}
+                      />
+                    </div>
+                  )
+                ))}
+              </div>
             </div>
           ) : (
             <div style={{
               marginBottom: 20, borderRadius: 16,
-              background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+              background: "#FFFFFF", border: "1px solid rgba(15,23,42,0.08)",
               padding: "28px 20px", textAlign: "center",
             }}>
               <div style={{ fontSize: 32, marginBottom: 8 }}>🏋️</div>
-              <div style={{ fontSize: 13, color: "#555" }}>Search "{exerciseName}" on YouTube for a video demo</div>
+              <div style={{ fontSize: 13, color: "#94A3B8" }}>Search "{exerciseName}" on YouTube for a video demo</div>
             </div>
           )}
 
           {/* Muscles */}
           {info.muscles.length > 0 && (
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 11, color: "#555", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>Muscles Worked</div>
+              <div style={{ fontSize: 11, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>Muscles Worked</div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                 {info.muscles.map((m, i) => (
                   <div key={i} style={{
-                    background: i === 0 ? `${accentColor}18` : "rgba(255,255,255,0.06)",
-                    border: `1px solid ${i === 0 ? accentColor + "44" : "rgba(255,255,255,0.1)"}`,
+                    background: i === 0 ? `${accentColor}18` : "#F1F5F9",
+                    border: `1px solid ${i === 0 ? accentColor + "44" : "rgba(15,23,42,0.08)"}`,
                     borderRadius: 20, padding: "5px 12px",
                     fontSize: 12, fontWeight: 600,
                     color: i === 0 ? accentColor : "#666",
@@ -1398,11 +1416,11 @@ const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
           {/* Description */}
           {info.desc ? (
             <div>
-              <div style={{ fontSize: 11, color: "#555", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>How To</div>
-              <div style={{ fontSize: 14, color: "#aaa", lineHeight: 1.7 }}>{info.desc}</div>
+              <div style={{ fontSize: 11, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>How To</div>
+              <div style={{ fontSize: 14, color: "#64748B", lineHeight: 1.7 }}>{info.desc}</div>
             </div>
           ) : (
-            <div style={{ fontSize: 13, color: "#555", lineHeight: 1.6, fontStyle: "italic" }}>
+            <div style={{ fontSize: 13, color: "#94A3B8", lineHeight: 1.6, fontStyle: "italic" }}>
               Search "{exerciseName}" on YouTube for a video demonstration.
             </div>
           )}
@@ -1644,9 +1662,9 @@ const WorkoutScreen = ({ phase, dayKey, workoutDay, exerciseLogs, onSave, onFini
               background: ex.swappedFrom ? "rgba(255,107,53,0.15)" : "rgba(255,255,255,0.07)",
               border:`1px solid ${ex.swappedFrom ? "rgba(255,107,53,0.4)" : "rgba(255,255,255,0.12)"}`,
               borderRadius:10, padding:"7px 12px", cursor:"pointer", flexShrink:0,
-              color: ex.swappedFrom ? "#ff6b35" : "#aaa", fontSize:12, fontWeight:700,
+              color: ex.swappedFrom ? "#DC2626" : "#aaa", fontSize:12, fontWeight:700,
             }}>
-              <Icon name="swap" size={14} color={ex.swappedFrom ? "#ff6b35" : "#aaa"} />
+              <Icon name="swap" size={14} color={ex.swappedFrom ? "#DC2626" : "#aaa"} />
               {ex.swappedFrom ? "Swap Again" : "Swap"}
             </button>
           )}
@@ -1660,7 +1678,7 @@ const WorkoutScreen = ({ phase, dayKey, workoutDay, exerciseLogs, onSave, onFini
                 height:6, flex:1, borderRadius:3, cursor:"pointer",
                 background: i < currentExIdx ? accentColor
                   : i === currentExIdx ? `${accentColor}88`
-                  : "rgba(255,255,255,0.1)",
+                  : "rgba(15,23,42,0.08)",
                 transition:"all 0.3s",
               }} />
             );
@@ -1674,7 +1692,7 @@ const WorkoutScreen = ({ phase, dayKey, workoutDay, exerciseLogs, onSave, onFini
 
       {/* Previous performance */}
       {prevLog ? (
-        <div style={{ ...S.card(), display:"flex", gap:12, alignItems:"center", marginBottom:12, background:"rgba(0,255,136,0.04)", border:"1px solid rgba(0,255,136,0.15)" }}>
+        <div style={{ ...S.card(), display:"flex", gap:12, alignItems:"center", marginBottom:12, background:"rgba(37,99,235,0.03)", border:"1px solid rgba(37,99,235,0.10)" }}>
           <Icon name="bolt" size={18} color={accentColor} />
           <div>
             <div style={{ fontSize:11, color:accentColor, textTransform:"uppercase", letterSpacing:"0.08em", fontWeight:700 }}>Last Session</div>
@@ -1696,7 +1714,7 @@ const WorkoutScreen = ({ phase, dayKey, workoutDay, exerciseLogs, onSave, onFini
             Weight (lbs){isDumbbellExercise(ex.name) ? " — each hand" : ""}
           </div>
           {isDumbbellExercise(ex.name) && (
-            <div style={{ fontSize:11, background:"rgba(255,200,50,0.12)", border:"1px solid rgba(255,200,50,0.25)", borderRadius:6, padding:"2px 8px", color:"#ffc832" }}>
+            <div style={{ fontSize:11, background:"rgba(217,119,6,0.08)", border:"1px solid rgba(217,119,6,0.20)", borderRadius:6, padding:"2px 8px", color:"#D97706" }}>
               🥊 × 2
             </div>
           )}
@@ -1758,12 +1776,12 @@ const WorkoutScreen = ({ phase, dayKey, workoutDay, exerciseLogs, onSave, onFini
                     <input type="number" inputMode="decimal" value={setInfo?.w} autoFocus
                       onChange={e => handleEditSet(ex.name, i, "w", e.target.value)}
                       onFocus={e => e.target.select()}
-                      style={{ background:"rgba(255,255,255,0.08)", border:"none", borderRadius:6, color:"#fff", fontSize:14, fontWeight:700, textAlign:"center", width:"100%", outline:"none", padding:"4px 0" }}/>
+                      style={{ background:"#F1F5F9", border:"1px solid rgba(15,23,42,0.10)", borderRadius:6, color:"#0F172A", fontSize:14, fontWeight:700, textAlign:"center", width:"100%", outline:"none", padding:"4px 0" }}/>
                     <div style={{ fontSize:9, color:"#666", textAlign:"center", textTransform:"uppercase" }}>reps</div>
                     <input type="number" inputMode="numeric" value={setInfo?.r}
                       onChange={e => handleEditSet(ex.name, i, "r", e.target.value)}
                       onFocus={e => e.target.select()}
-                      style={{ background:"rgba(255,255,255,0.08)", border:"none", borderRadius:6, color:"#aaa", fontSize:12, textAlign:"center", width:"100%", outline:"none", padding:"3px 0" }}/>
+                      style={{ background:"#F1F5F9", border:"1px solid rgba(15,23,42,0.10)", borderRadius:6, color:"#64748B", fontSize:12, textAlign:"center", width:"100%", outline:"none", padding:"3px 0" }}/>
                   </div>
                 ) : done ? (
                   <>
@@ -1801,7 +1819,7 @@ const WorkoutScreen = ({ phase, dayKey, workoutDay, exerciseLogs, onSave, onFini
           style={{
             width: "100%", marginTop: 8, padding: "11px",
             background: "transparent", border: "none",
-            color: "#555", fontSize: 13, cursor: "pointer",
+            color: "#94A3B8", fontSize: 13, cursor: "pointer",
           }}
         >
           Skip exercise →
@@ -1856,12 +1874,12 @@ const WeightScreen = ({ weightLogs, onLog, accentColor }) => {
 
   return (
     <div style={{ ...S.scroll, padding: "60px 16px 20px" }}>
-      <div style={{ fontSize: 13, color: "#666", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Track</div>
+      <div style={{ fontSize: 13, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Track</div>
       <div style={{ fontSize: 26, fontWeight: 900, marginBottom: 24 }}>Body Weight</div>
 
       {/* Log weight */}
       <div style={{ ...S.card(), marginBottom: 12 }}>
-        <div style={{ fontSize: 12, color: "#666", marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.08em" }}>Log Today's Weight</div>
+        <div style={{ fontSize: 12, color: "#94A3B8", marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.08em" }}>Log Today's Weight</div>
         <div style={{ display: "flex", gap: 10 }}>
           <input
             type="number" inputMode="decimal"
@@ -1870,9 +1888,9 @@ const WeightScreen = ({ weightLogs, onLog, accentColor }) => {
             onChange={e => setInputVal(e.target.value)}
             onKeyDown={e => e.key === "Enter" && handleLog()}
             style={{
-              flex: 1, background: "rgba(255,255,255,0.07)",
+              flex: 1, background: "#F8FAFC",
               border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12,
-              color: "#fff", fontSize: 20, fontWeight: 700,
+              color: "#0F172A", fontSize: 20, fontWeight: 700,
               padding: "14px 16px", outline: "none",
             }}
           />
@@ -1881,7 +1899,7 @@ const WeightScreen = ({ weightLogs, onLog, accentColor }) => {
             style={{
               ...S.bigBtn(logged ? "#1a3a2a" : accentColor),
               flex: 0, padding: "14px 20px", fontSize: 14,
-              color: logged ? "#00ff88" : "#000",
+              color: logged ? "#2563EB" : "#000",
             }}
           >
             {logged ? "✓" : "Log"}
@@ -1893,15 +1911,15 @@ const WeightScreen = ({ weightLogs, onLog, accentColor }) => {
       {latest && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 12 }}>
           <div style={{ ...S.card(), marginBottom: 0, textAlign: "center" }}>
-            <div style={{ fontSize: 11, color: "#666", textTransform: "uppercase", letterSpacing: "0.08em" }}>Current</div>
+            <div style={{ fontSize: 11, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.08em" }}>Current</div>
             <div style={{ fontSize: 28, fontWeight: 900, color: accentColor, marginTop: 4 }}>
-              {latest.weight_value}<span style={{ fontSize: 14, color: "#555", fontWeight: 400 }}> lbs</span>
+              {latest.weight_value}<span style={{ fontSize: 14, color: "#94A3B8", fontWeight: 400 }}> lbs</span>
             </div>
           </div>
           <div style={{ ...S.card(), marginBottom: 0, textAlign: "center" }}>
-            <div style={{ fontSize: 11, color: "#666", textTransform: "uppercase", letterSpacing: "0.08em" }}>Change</div>
-            <div style={{ fontSize: 28, fontWeight: 900, marginTop: 4, color: diff > 0 ? "#ff6b35" : diff < 0 ? accentColor : "#888" }}>
-              {diff !== null ? (diff > 0 ? `+${diff}` : diff) : "—"}<span style={{ fontSize: 14, color: "#555", fontWeight: 400 }}> lbs</span>
+            <div style={{ fontSize: 11, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.08em" }}>Change</div>
+            <div style={{ fontSize: 28, fontWeight: 900, marginTop: 4, color: diff > 0 ? "#DC2626" : diff < 0 ? accentColor : "#888" }}>
+              {diff !== null ? (diff > 0 ? `+${diff}` : diff) : "—"}<span style={{ fontSize: 14, color: "#94A3B8", fontWeight: 400 }}> lbs</span>
             </div>
           </div>
         </div>
@@ -1910,15 +1928,15 @@ const WeightScreen = ({ weightLogs, onLog, accentColor }) => {
       {/* Chart */}
       {chartData.length >= 2 ? (
         <div style={{ ...S.card(), marginBottom: 0 }}>
-          <div style={{ fontSize: 12, color: "#666", marginBottom: 12, textTransform: "uppercase", letterSpacing: "0.08em" }}>Last {chartData.length} entries</div>
+          <div style={{ fontSize: 12, color: "#94A3B8", marginBottom: 12, textTransform: "uppercase", letterSpacing: "0.08em" }}>Last {chartData.length} entries</div>
           <LineChart data={chartData} color={accentColor} height={140} />
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-            <div style={{ fontSize: 10, color: "#555" }}>{chartData[0]?.label}</div>
-            <div style={{ fontSize: 10, color: "#555" }}>{chartData[chartData.length - 1]?.label}</div>
+            <div style={{ fontSize: 10, color: "#94A3B8" }}>{chartData[0]?.label}</div>
+            <div style={{ fontSize: 10, color: "#94A3B8" }}>{chartData[chartData.length - 1]?.label}</div>
           </div>
         </div>
       ) : (
-        <div style={{ ...S.card(), textAlign: "center", color: "#555", fontSize: 13 }}>
+        <div style={{ ...S.card(), textAlign: "center", color: "#94A3B8", fontSize: 13 }}>
           Log at least 2 entries to see your trend chart.
         </div>
       )}
@@ -1947,15 +1965,15 @@ const ExerciseProgressChart = ({ exerciseName, logs, accentColor, onClose }) => 
       {/* Header */}
       <div style={{ padding: "56px 20px 20px", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div>
-          <div style={{ fontSize: 11, color: "#666", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Progress</div>
+          <div style={{ fontSize: 11, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Progress</div>
           <div style={{ fontSize: 22, fontWeight: 900, lineHeight: 1.2 }}>{exerciseName}</div>
-          <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>{history.length} session{history.length !== 1 ? "s" : ""} logged</div>
+          <div style={{ fontSize: 12, color: "#94A3B8", marginTop: 4 }}>{history.length} session{history.length !== 1 ? "s" : ""} logged</div>
         </div>
         <button onClick={onClose} style={{
-          background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 12,
+          background: "rgba(15,23,42,0.06)", border: "none", borderRadius: 12,
           width: 40, height: 40, cursor: "pointer", display: "flex",
           alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 4,
-          color: "#aaa", fontSize: 20,
+          color: "#64748B", fontSize: 20,
         }}>✕</button>
       </div>
 
@@ -1965,35 +1983,35 @@ const ExerciseProgressChart = ({ exerciseName, logs, accentColor, onClose }) => 
           {[
             { label: "Current", value: `${last ?? "—"} lbs`, color: accentColor },
             { label: "Best",    value: `${best ?? "—"} lbs`, color: "#ffd700" },
-            { label: "Total Gain", value: gain >= 0 ? `+${gain} lbs` : `${gain} lbs`, color: gain >= 0 ? accentColor : "#ff6b35" },
+            { label: "Total Gain", value: gain >= 0 ? `+${gain} lbs` : `${gain} lbs`, color: gain >= 0 ? accentColor : "#DC2626" },
           ].map(s => (
-            <div key={s.label} style={{ background: "rgba(255,255,255,0.04)", borderRadius: 14, padding: "12px 10px", textAlign: "center" }}>
-              <div style={{ fontSize: 10, color: "#666", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>{s.label}</div>
+            <div key={s.label} style={{ background: "#FFFFFF", borderRadius: 14, padding: "12px 10px", textAlign: "center" }}>
+              <div style={{ fontSize: 10, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>{s.label}</div>
               <div style={{ fontSize: 15, fontWeight: 800, color: s.color }}>{s.value}</div>
             </div>
           ))}
         </div>
 
         {/* Weight chart */}
-        <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 20, padding: "16px 12px 10px", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 20 }}>
-          <div style={{ fontSize: 12, color: "#666", marginBottom: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" }}>Weight Over Time</div>
+        <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 20, padding: "16px 12px 10px", border: "1px solid rgba(15,23,42,0.08)", marginBottom: 20 }}>
+          <div style={{ fontSize: 12, color: "#94A3B8", marginBottom: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" }}>Weight Over Time</div>
           {chartData.length >= 2 ? (
             <>
               <LineChart data={chartData} color={accentColor} height={140} />
               <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
-                <div style={{ fontSize: 10, color: "#555" }}>{chartData[0]?.label}</div>
-                <div style={{ fontSize: 10, color: "#555" }}>{chartData[chartData.length - 1]?.label}</div>
+                <div style={{ fontSize: 10, color: "#94A3B8" }}>{chartData[0]?.label}</div>
+                <div style={{ fontSize: 10, color: "#94A3B8" }}>{chartData[chartData.length - 1]?.label}</div>
               </div>
             </>
           ) : (
-            <div style={{ height: 80, display: "flex", alignItems: "center", justifyContent: "center", color: "#555", fontSize: 13 }}>
+            <div style={{ height: 80, display: "flex", alignItems: "center", justifyContent: "center", color: "#94A3B8", fontSize: 13 }}>
               Log at least 2 sessions to see your trend
             </div>
           )}
         </div>
 
         {/* Session log */}
-        <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>All Sessions</div>
+        <div style={{ fontSize: 12, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>All Sessions</div>
         {history.slice().reverse().map((log, i) => {
           const isLatest = i === 0;
           return (
@@ -2009,10 +2027,10 @@ const ExerciseProgressChart = ({ exerciseName, logs, accentColor, onClose }) => 
                   {new Date(log.date).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
                   {isLatest && <span style={{ marginLeft: 8, fontSize: 10, color: accentColor, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>Latest</span>}
                 </div>
-                <div style={{ fontSize: 11, color: "#666", marginTop: 2 }}>{log.sets} sets × {log.reps} reps</div>
+                <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 2 }}>{log.sets} sets × {log.reps} reps</div>
               </div>
               <div style={{ fontSize: 17, fontWeight: 800, color: isLatest ? accentColor : "#888" }}>
-                {log.weight_used}<span style={{ fontSize: 11, color: "#555", fontWeight: 400 }}> lbs</span>
+                {log.weight_used}<span style={{ fontSize: 11, color: "#94A3B8", fontWeight: 400 }}> lbs</span>
               </div>
             </div>
           );
@@ -2049,15 +2067,15 @@ const HistoryScreen = ({ exerciseLogs, accentColor }) => {
 
   return (
     <div style={{ ...S.scroll, padding: "60px 16px 120px", overflowY: "auto", height: "100vh", boxSizing: "border-box" }}>
-      <div style={{ fontSize: 13, color: "#666", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Your</div>
+      <div style={{ fontSize: 13, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Your</div>
       <div style={{ fontSize: 26, fontWeight: 900, marginBottom: 6 }}>Exercise History</div>
-      <div style={{ fontSize: 13, color: "#666", marginBottom: 24 }}>Tap any exercise to see your progress chart.</div>
+      <div style={{ fontSize: 13, color: "#94A3B8", marginBottom: 24 }}>Tap any exercise to see your progress chart.</div>
 
       {exercises.length === 0 ? (
-        <div style={{ textAlign: "center", color: "#555", padding: "60px 0" }}>
+        <div style={{ textAlign: "center", color: "#94A3B8", padding: "60px 0" }}>
           <Icon name="dumbbell" size={40} color="#333" />
           <div style={{ marginTop: 16, fontSize: 15 }}>No workouts logged yet.</div>
-          <div style={{ fontSize: 13, color: "#555", marginTop: 6 }}>Complete your first workout to see history.</div>
+          <div style={{ fontSize: 13, color: "#94A3B8", marginTop: 6 }}>Complete your first workout to see history.</div>
         </div>
       ) : exercises.map(([name, log]) => {
         const sessionCount = exerciseLogs.filter(l => l.exercise_name === name).length;
@@ -2067,8 +2085,8 @@ const HistoryScreen = ({ exerciseLogs, accentColor }) => {
             onClick={() => setSelectedExercise(name)}
             style={{
               width: "100%", textAlign: "left", cursor: "pointer",
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.08)",
+              background: "#FFFFFF",
+              border: "1px solid rgba(15,23,42,0.08)",
               borderRadius: 18, padding: "16px 18px", marginBottom: 10,
               display: "flex", justifyContent: "space-between", alignItems: "center",
               transition: "border-color 0.15s",
@@ -2077,17 +2095,17 @@ const HistoryScreen = ({ exerciseLogs, accentColor }) => {
             onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"}
           >
             <div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "#fff", marginBottom: 4 }}>{name}</div>
-              <div style={{ fontSize: 12, color: "#666" }}>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A", marginBottom: 4 }}>{name}</div>
+              <div style={{ fontSize: 12, color: "#94A3B8" }}>
                 {log.sets} sets × {log.reps} reps · {sessionCount} session{sessionCount !== 1 ? "s" : ""}
               </div>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
               <div style={{ textAlign: "right" }}>
                 <div style={{ fontSize: 20, fontWeight: 900, color: accentColor }}>{log.weight_used}</div>
-                <div style={{ fontSize: 11, color: "#555" }}>lbs</div>
+                <div style={{ fontSize: 11, color: "#94A3B8" }}>lbs</div>
               </div>
-              <div style={{ color: "#444", fontSize: 18 }}>›</div>
+              <div style={{ color: "#CBD5E1", fontSize: 18 }}>›</div>
             </div>
           </button>
         );
@@ -2145,18 +2163,18 @@ const ProfileScreen = ({ user, phase, authUser, cloudLoading, onReset, onSaveNam
   };
 
   const inputStyle = {
-    background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)",
-    borderRadius: 12, color: "#fff", fontSize: 15, width: "100%",
+    background: "#F8FAFC", border: "1px solid rgba(255,255,255,0.12)",
+    borderRadius: 12, color: "#0F172A", fontSize: 15, width: "100%",
     padding: "13px 14px", outline: "none", boxSizing: "border-box", marginBottom: 10,
   };
 
   return (
     <div style={{ ...S.scroll, padding: "60px 16px 120px", overflowY: "auto", height: "100vh", boxSizing: "border-box" }}>
-      <div style={{ fontSize: 13, color: "#666", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Your</div>
+      <div style={{ fontSize: 13, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Your</div>
       <div style={{ fontSize: 26, fontWeight: 900, marginBottom: 24 }}>Profile</div>
 
       <div style={{ ...S.card(), marginBottom: 12 }}>
-        <div style={{ fontSize: 12, color: "#666", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.08em" }}>Display Name</div>
+        <div style={{ fontSize: 12, color: "#94A3B8", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.08em" }}>Display Name</div>
         <input
           type="text"
           value={name}
@@ -2176,7 +2194,7 @@ const ProfileScreen = ({ user, phase, authUser, cloudLoading, onReset, onSaveNam
           { label: "Phase Color", value: "●", color: phase.color },
         ].map((stat) => (
           <div key={stat.label} style={{ ...S.card(), marginBottom: 0 }}>
-            <div style={{ fontSize: 11, color: "#666", textTransform: "uppercase", letterSpacing: "0.08em" }}>{stat.label}</div>
+            <div style={{ fontSize: 11, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.08em" }}>{stat.label}</div>
             <div style={{ fontSize: 20, fontWeight: 800, marginTop: 6, color: stat.color || "#fff" }}>{stat.value}</div>
           </div>
         ))}
@@ -2190,7 +2208,7 @@ const ProfileScreen = ({ user, phase, authUser, cloudLoading, onReset, onSaveNam
             <div style={{ width: 10, height: 10, borderRadius: "50%", background: p.id === phase.id ? p.color : "#333", flexShrink: 0, boxShadow: p.id === phase.id ? `0 0 10px ${p.color}` : "none" }} />
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: p.id === phase.id ? p.color : "#888" }}>{p.name} {p.id === phase.id ? "← Active" : ""}</div>
-              <div style={{ fontSize: 11, color: "#666" }}>{p.desc} · {p.weeks * 7} days</div>
+              <div style={{ fontSize: 11, color: "#94A3B8" }}>{p.desc} · {p.weeks * 7} days</div>
             </div>
           </div>
         ))}
@@ -2204,7 +2222,7 @@ const ProfileScreen = ({ user, phase, authUser, cloudLoading, onReset, onSaveNam
       </button>
 
       <button
-        style={{ ...S.bigBtn("#444"), color: "#ff6b35", boxShadow: "none", marginBottom: 12 }}
+        style={{ ...S.bigBtn("#444"), color: "#DC2626", boxShadow: "none", marginBottom: 12 }}
         onClick={() => { if (window.confirm("Reset all data? This cannot be undone.")) onReset(); }}
       >
         Reset All Data
@@ -2216,11 +2234,11 @@ const ProfileScreen = ({ user, phase, authUser, cloudLoading, onReset, onSaveNam
         <div style={{ ...S.card(), marginBottom: 12, border: `1px solid ${accentColor}33` }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
             <div style={{ fontSize: 12, color: accentColor, textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700 }}>☁ Cloud Sync Active</div>
-            {cloudLoading && <div style={{ fontSize: 11, color: "#666" }}>syncing...</div>}
+            {cloudLoading && <div style={{ fontSize: 11, color: "#94A3B8" }}>syncing...</div>}
           </div>
-          <div style={{ fontSize: 13, color: "#888", marginBottom: 14 }}>{authUser.email}</div>
+          <div style={{ fontSize: 13, color: "#94A3B8", marginBottom: 14 }}>{authUser.email}</div>
           <button
-            style={{ ...S.bigBtn("#1a1a2e"), color: "#888", boxShadow: "none", border: "1px solid rgba(255,255,255,0.08)" }}
+            style={{ ...S.bigBtn("#F8FAFC"), color: "#94A3B8", boxShadow: "none", border: "1px solid rgba(15,23,42,0.08)" }}
             onClick={() => { if (window.confirm("Sign out of FitForge?")) onSignOut(); }}
           >
             Sign Out
@@ -2229,8 +2247,8 @@ const ProfileScreen = ({ user, phase, authUser, cloudLoading, onReset, onSaveNam
       ) : (
         // Guest — show inline login/signup
         <div style={{ ...S.card(), marginBottom: 12 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 4 }}>☁ Save to Cloud</div>
-          <div style={{ fontSize: 12, color: "#666", marginBottom: 16, lineHeight: 1.5 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", marginBottom: 4 }}>☁ Save to Cloud</div>
+          <div style={{ fontSize: 12, color: "#94A3B8", marginBottom: 16, lineHeight: 1.5 }}>
             Create a free account to back up your data and access it from any device.
           </div>
 
@@ -2259,7 +2277,7 @@ const ProfileScreen = ({ user, phase, authUser, cloudLoading, onReset, onSaveNam
             onKeyDown={e => e.key === "Enter" && handleAuth()}
             style={{ ...inputStyle, marginBottom: 0 }} />
 
-          {authError && <div style={{ color: "#ff6b35", fontSize: 12, marginTop: 10 }}>{authError}</div>}
+          {authError && <div style={{ color: "#DC2626", fontSize: 12, marginTop: 10 }}>{authError}</div>}
           {authMessage && <div style={{ color: accentColor, fontSize: 12, marginTop: 10 }}>{authMessage}</div>}
 
           <button
@@ -2340,28 +2358,28 @@ const OnboardingScreen = ({ onComplete, accentColor }) => {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0a0a0f", display: "flex", flexDirection: "column" }}>
+    <div style={{ minHeight: "100vh", background: "#F1F5F9", display: "flex", flexDirection: "column" }}>
       {/* Progress bar */}
-      <div style={{ height: 3, background: "rgba(255,255,255,0.06)", position: "fixed", top: 0, left: 0, right: 0, zIndex: 10 }}>
-        <div style={{ height: "100%", background: "#00ff88", width: `${((step + 1) / totalSteps) * 100}%`, transition: "width 0.4s ease" }} />
+      <div style={{ height: 3, background: "#F8FAFC", position: "fixed", top: 0, left: 0, right: 0, zIndex: 10 }}>
+        <div style={{ height: "100%", background: "#2563EB", width: `${((step + 1) / totalSteps) * 100}%`, transition: "width 0.4s ease" }} />
       </div>
 
       <div style={{ flex: 1, padding: "64px 20px 120px", maxWidth: 430, margin: "0 auto", width: "100%" }}>
         {/* Step indicator */}
-        <div style={{ fontSize: 11, color: "#555", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>
+        <div style={{ fontSize: 11, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>
           Step {step + 1} of {totalSteps}
         </div>
 
         <div style={slideStyle}>
           <div style={{ fontSize: 26, fontWeight: 900, marginBottom: 6, lineHeight: 1.2 }}>{steps[step].title}</div>
-          <div style={{ fontSize: 14, color: "#666", marginBottom: 28 }}>{steps[step].subtitle}</div>
+          <div style={{ fontSize: 14, color: "#94A3B8", marginBottom: 28 }}>{steps[step].subtitle}</div>
 
           {/* STEP 0 — Gender */}
           {step === 0 && (() => {
             const opts = [
               { id: "male",   label: "Male",   icon: "♂",  sel: "rgba(59,130,246,0.15)",  border: "#3b82f6" },
               { id: "female", label: "Female", icon: "♀",  sel: "rgba(232,121,249,0.15)", border: "#e879f9" },
-              { id: "other",  label: "Prefer not to say", icon: "✦", sel: "rgba(0,255,136,0.12)", border: "#00ff88" },
+              { id: "other",  label: "Prefer not to say", icon: "✦", sel: "rgba(37,99,235,0.08)", border: "#2563EB" },
             ];
             return (
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -2394,18 +2412,18 @@ const OnboardingScreen = ({ onComplete, accentColor }) => {
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {GOALS.map(g => (
                 <button key={g.id} onClick={() => setGoal(g.id)} style={{
-                  background: goal === g.id ? "rgba(0,255,136,0.12)" : "rgba(255,255,255,0.04)",
-                  border: `1px solid ${goal === g.id ? "#00ff88" : "rgba(255,255,255,0.09)"}`,
+                  background: goal === g.id ? "rgba(37,99,235,0.08)" : "rgba(255,255,255,0.04)",
+                  border: `1px solid ${goal === g.id ? "#2563EB" : "rgba(255,255,255,0.09)"}`,
                   borderRadius: 16, padding: "16px 18px", cursor: "pointer",
                   display: "flex", alignItems: "center", gap: 14, textAlign: "left",
                   transition: "all 0.18s",
                 }}>
                   <span style={{ fontSize: 28 }}>{g.icon}</span>
                   <div>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: goal === g.id ? "#00ff88" : "#fff" }}>{g.label}</div>
-                    <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>{g.desc}</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: goal === g.id ? "#2563EB" : "#fff" }}>{g.label}</div>
+                    <div style={{ fontSize: 12, color: "#94A3B8", marginTop: 2 }}>{g.desc}</div>
                   </div>
-                  {goal === g.id && <div style={{ marginLeft: "auto", color: "#00ff88", fontSize: 18 }}>✓</div>}
+                  {goal === g.id && <div style={{ marginLeft: "auto", color: "#2563EB", fontSize: 18 }}>✓</div>}
                 </button>
               ))}
             </div>
@@ -2416,16 +2434,15 @@ const OnboardingScreen = ({ onComplete, accentColor }) => {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
               {EQUIPMENT_OPTIONS.map(e => {
                 const sel = equipment.includes(e.id);
-                const bwOnly = equipment.includes("bodyweight") && e.id !== "bodyweight";
                 return (
-                  <button key={e.id} onClick={() => toggleEquip(e.id)} disabled={bwOnly} style={{
-                    background: sel ? "rgba(0,255,136,0.12)" : "rgba(255,255,255,0.04)",
-                    border: `1px solid ${sel ? "#00ff88" : "rgba(255,255,255,0.09)"}`,
-                    borderRadius: 14, padding: "16px 12px", cursor: bwOnly ? "default" : "pointer",
-                    opacity: bwOnly ? 0.35 : 1, transition: "all 0.18s", textAlign: "center",
+                  <button key={e.id} onClick={() => toggleEquip(e.id)} style={{
+                    background: sel ? "rgba(37,99,235,0.08)" : "rgba(255,255,255,0.04)",
+                    border: `1px solid ${sel ? "#2563EB" : "rgba(255,255,255,0.09)"}`,
+                    borderRadius: 14, padding: "16px 12px", cursor: "pointer",
+                    opacity: 1, transition: "all 0.18s", textAlign: "center",
                   }}>
                     <div style={{ fontSize: 26, marginBottom: 6 }}>{e.icon}</div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: sel ? "#00ff88" : "#aaa" }}>{e.label}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: sel ? "#2563EB" : "#64748B" }}>{e.label}</div>
                   </button>
                 );
               })}
@@ -2437,17 +2454,17 @@ const OnboardingScreen = ({ onComplete, accentColor }) => {
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {FREQUENCY_OPTIONS.map(f => (
                 <button key={f.id} onClick={() => setFrequency(f.id)} style={{
-                  background: frequency === f.id ? "rgba(0,255,136,0.12)" : "rgba(255,255,255,0.04)",
-                  border: `1px solid ${frequency === f.id ? "#00ff88" : "rgba(255,255,255,0.09)"}`,
+                  background: frequency === f.id ? "rgba(37,99,235,0.08)" : "rgba(255,255,255,0.04)",
+                  border: `1px solid ${frequency === f.id ? "#2563EB" : "rgba(255,255,255,0.09)"}`,
                   borderRadius: 16, padding: "18px 20px", cursor: "pointer",
                   display: "flex", justifyContent: "space-between", alignItems: "center",
                   transition: "all 0.18s",
                 }}>
                   <div style={{ textAlign: "left" }}>
-                    <div style={{ fontSize: 17, fontWeight: 800, color: frequency === f.id ? "#00ff88" : "#fff" }}>{f.label}</div>
-                    <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>{f.desc}</div>
+                    <div style={{ fontSize: 17, fontWeight: 800, color: frequency === f.id ? "#2563EB" : "#fff" }}>{f.label}</div>
+                    <div style={{ fontSize: 12, color: "#94A3B8", marginTop: 2 }}>{f.desc}</div>
                   </div>
-                  {frequency === f.id && <div style={{ color: "#00ff88", fontSize: 20 }}>✓</div>}
+                  {frequency === f.id && <div style={{ color: "#2563EB", fontSize: 20 }}>✓</div>}
                 </button>
               ))}
             </div>
@@ -2463,20 +2480,20 @@ const OnboardingScreen = ({ onComplete, accentColor }) => {
                 onChange={e => setName(e.target.value)}
                 autoFocus
                 style={{
-                  width: "100%", background: "rgba(255,255,255,0.07)",
+                  width: "100%", background: "#F8FAFC",
                   border: "1px solid rgba(255,255,255,0.14)", borderRadius: 16,
-                  color: "#fff", fontSize: 22, fontWeight: 700,
+                  color: "#0F172A", fontSize: 22, fontWeight: 700,
                   padding: "18px 20px", outline: "none", boxSizing: "border-box",
                   marginBottom: 16,
                 }}
               />
-              <div style={{ fontSize: 13, color: "#555", lineHeight: 1.6 }}>
+              <div style={{ fontSize: 13, color: "#94A3B8", lineHeight: 1.6 }}>
                 Your workouts will be tailored to your goal, available equipment, and training frequency. You can always update these in your profile.
               </div>
 
               {/* Summary */}
-              <div style={{ marginTop: 24, background: "rgba(255,255,255,0.04)", borderRadius: 16, padding: "16px 18px" }}>
-                <div style={{ fontSize: 11, color: "#555", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>Your Plan</div>
+              <div style={{ marginTop: 24, background: "#FFFFFF", borderRadius: 16, padding: "16px 18px" }}>
+                <div style={{ fontSize: 11, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>Your Plan</div>
                 {[
                   { label: "Gender", value: gender === "female" ? "Female 🌸" : gender === "male" ? "Male" : "Not specified" },
                   { label: "Goal", value: GOALS.find(g => g.id === goal)?.label },
@@ -2484,7 +2501,7 @@ const OnboardingScreen = ({ onComplete, accentColor }) => {
                   { label: "Equipment", value: equipment.map(e => EQUIPMENT_OPTIONS.find(o => o.id === e)?.label).filter(Boolean).join(", ") },
                 ].map(row => (
                   <div key={row.label} style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                    <span style={{ fontSize: 13, color: "#666" }}>{row.label}</span>
+                    <span style={{ fontSize: 13, color: "#94A3B8" }}>{row.label}</span>
                     <span style={{ fontSize: 13, fontWeight: 700, color: "#ccc", maxWidth: "60%", textAlign: "right" }}>{row.value}</span>
                   </div>
                 ))}
@@ -2495,7 +2512,7 @@ const OnboardingScreen = ({ onComplete, accentColor }) => {
       </div>
 
       {/* Bottom nav */}
-      <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, padding: "16px 20px 36px", background: "linear-gradient(transparent, #0a0a0f 40%)" }}>
+      <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, padding: "16px 20px 36px", background: "linear-gradient(transparent, #F1F5F9 40%)" }}>
         {/* Skip setup */}
         <button onClick={() => onComplete({
           gender: "other", goal: "general_fitness",
@@ -2504,7 +2521,7 @@ const OnboardingScreen = ({ onComplete, accentColor }) => {
         })} style={{
           width: "100%", padding: "10px", marginBottom: 10,
           background: "transparent", border: "none",
-          color: "#444", fontSize: 13, cursor: "pointer",
+          color: "#CBD5E1", fontSize: 13, cursor: "pointer",
           textDecoration: "underline", textDecorationColor: "#333",
         }}>
           Skip setup — use defaults
@@ -2512,8 +2529,8 @@ const OnboardingScreen = ({ onComplete, accentColor }) => {
         <div style={{ display: "flex", gap: 10 }}>
           {step > 0 && (
             <button onClick={() => goTo(step - 1)} style={{
-              flex: 0, padding: "16px 20px", borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)",
-              background: "transparent", color: "#666", fontSize: 15, fontWeight: 700, cursor: "pointer",
+              flex: 0, padding: "16px 20px", borderRadius: 16, border: "1px solid rgba(15,23,42,0.12)",
+              background: "transparent", color: "#94A3B8", fontSize: 15, fontWeight: 700, cursor: "pointer",
             }}>←</button>
           )}
           <button
@@ -2521,7 +2538,7 @@ const OnboardingScreen = ({ onComplete, accentColor }) => {
             disabled={!canAdvance[step]}
             style={{
               flex: 1, padding: "16px", borderRadius: 16, border: "none",
-              background: canAdvance[step] ? "#00ff88" : "rgba(255,255,255,0.07)",
+              background: canAdvance[step] ? "#2563EB" : "rgba(255,255,255,0.07)",
               color: canAdvance[step] ? "#000" : "#444",
               fontSize: 16, fontWeight: 800, cursor: canAdvance[step] ? "pointer" : "default",
               transition: "all 0.2s",
@@ -2572,15 +2589,15 @@ const AuthScreen = ({ onAuth }) => {
   };
 
   const inputStyle = {
-    background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)",
-    borderRadius: 14, color: "#fff", fontSize: 16, width: "100%",
+    background: "#F8FAFC", border: "1px solid rgba(255,255,255,0.12)",
+    borderRadius: 14, color: "#0F172A", fontSize: 16, width: "100%",
     padding: "15px 16px", outline: "none", boxSizing: "border-box",
     marginBottom: 12,
   };
 
   return (
     <div style={{
-      minHeight: "100vh", background: "#0a0a0f", display: "flex",
+      minHeight: "100vh", background: "#F1F5F9", display: "flex",
       flexDirection: "column", alignItems: "center", justifyContent: "center",
       padding: "0 24px",
     }}>
@@ -2588,7 +2605,7 @@ const AuthScreen = ({ onAuth }) => {
       <div style={{
         position: "fixed", top: -80, left: "50%", transform: "translateX(-50%)",
         width: 300, height: 300, borderRadius: "50%",
-        background: "radial-gradient(circle, #00ff8820 0%, transparent 70%)",
+        background: "radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%)",
         pointerEvents: "none",
       }} />
 
@@ -2599,12 +2616,12 @@ const AuthScreen = ({ onAuth }) => {
             width: 72, height: 72, borderRadius: 20, background: "#141420",
             border: "1px solid rgba(0,255,136,0.3)", display: "flex",
             alignItems: "center", justifyContent: "center", margin: "0 auto 16px",
-            boxShadow: "0 0 32px rgba(0,255,136,0.15)",
+            boxShadow: "0 0 32px rgba(37,99,235,0.10)",
           }}>
             <span style={{ fontSize: 32 }}>⚡</span>
           </div>
-          <div style={{ fontSize: 28, fontWeight: 900, color: "#fff", letterSpacing: "-0.02em" }}>FitForge</div>
-          <div style={{ fontSize: 13, color: "#666", marginTop: 4 }}>
+          <div style={{ fontSize: 28, fontWeight: 900, color: "#0F172A", letterSpacing: "-0.02em" }}>FitForge</div>
+          <div style={{ fontSize: 13, color: "#94A3B8", marginTop: 4 }}>
             {mode === "login" ? "Welcome back. Let's lift." : "Start your strength journey."}
           </div>
         </div>
@@ -2617,7 +2634,7 @@ const AuthScreen = ({ onAuth }) => {
           {["login", "signup"].map(m => (
             <button key={m} onClick={() => { setMode(m); setError(""); setMessage(""); }} style={{
               flex: 1, padding: "10px", borderRadius: 9, border: "none",
-              background: mode === m ? "#00ff88" : "transparent",
+              background: mode === m ? "#2563EB" : "transparent",
               color: mode === m ? "#000" : "#666",
               fontWeight: 700, fontSize: 14, cursor: "pointer",
               transition: "all 0.2s", textTransform: "capitalize",
@@ -2646,10 +2663,10 @@ const AuthScreen = ({ onAuth }) => {
         />
 
         {error && (
-          <div style={{ color: "#ff6b35", fontSize: 13, marginBottom: 16, textAlign: "center" }}>{error}</div>
+          <div style={{ color: "#DC2626", fontSize: 13, marginBottom: 16, textAlign: "center" }}>{error}</div>
         )}
         {message && (
-          <div style={{ color: "#00ff88", fontSize: 13, marginBottom: 16, textAlign: "center" }}>{message}</div>
+          <div style={{ color: "#2563EB", fontSize: 13, marginBottom: 16, textAlign: "center" }}>{message}</div>
         )}
 
         <button
@@ -2658,7 +2675,7 @@ const AuthScreen = ({ onAuth }) => {
           style={{
             width: "100%", padding: "17px", borderRadius: 16,
             background: loading || !email || !password
-              ? "#222" : "linear-gradient(135deg, #00ff88, #00cc66)",
+              ? "#E2E8F0" : "linear-gradient(135deg, #2563EB, #1D4ED8)",
             color: loading || !email || !password ? "#555" : "#000",
             fontSize: 17, fontWeight: 800, border: "none",
             cursor: loading || !email || !password ? "default" : "pointer",
@@ -2678,10 +2695,10 @@ export default function App() {
   const [authUser, setAuthUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(false);
   const [tab, setTab] = useState("home");
-  const [isWorkingOut, setIsWorkingOut] = useState(false);
+  const [isWorkingOut, setIsWorkingOut] = useState(() => getStore("wip_active", false));
   const [cloudLoading, setCloudLoading] = useState(false);
-  const [savedWorkoutState, setSavedWorkoutState] = useState(null); // persists workout across nav
-  const [selectedDayKey, setSelectedDayKey] = useState(null); // user-chosen workout override
+  const [savedWorkoutState, setSavedWorkoutState] = useState(() => getStore("wip_state", null));
+  const [selectedDayKey, setSelectedDayKey] = useState(() => getStore("wip_dayKey", null));
   const [showOnboarding, setShowOnboarding] = useState(false); // show onboarding for new/pref-less users
 
   // ── Guest-mode local state (always available) ─────────────────────────────
@@ -2703,6 +2720,10 @@ export default function App() {
 
   // Persist guest data to localStorage
   useEffect(() => { setStore("user", guestProfile); }, [guestProfile]);
+  // Persist active workout so closing/backgrounding the app never loses progress
+  useEffect(() => { setStore("wip_active", isWorkingOut); }, [isWorkingOut]);
+  useEffect(() => { setStore("wip_state", savedWorkoutState); }, [savedWorkoutState]);
+  useEffect(() => { setStore("wip_dayKey", selectedDayKey); }, [selectedDayKey]);
   // Cache cloud profile so theme loads instantly on next open
   useEffect(() => { if (cloudProfile) setStore("cloudProfileCache", cloudProfile); }, [cloudProfile]);
   useEffect(() => { setStore("weightLogs", guestWeightLogs); }, [guestWeightLogs]);
@@ -2825,6 +2846,9 @@ export default function App() {
     // Called when user dismisses the celebration screen — clear state and navigate
     setSavedWorkoutState(null);
     setIsWorkingOut(false);
+    setStore("wip_active", false);
+    setStore("wip_state", null);
+    setStore("wip_dayKey", null);
     setTab("home");
   };
 
@@ -2908,7 +2932,7 @@ export default function App() {
   if (needsOnboarding || showOnboarding) {
     return (
       <OnboardingScreen
-        accentColor="#00ff88"
+        accentColor="#2563EB"
         onComplete={async (prefs) => {
           const update = {
             name: prefs.name,
