@@ -467,7 +467,7 @@ const LineChart = ({ data, color = "#2563EB", height = 80 }) => {
 // ─── STYLES ───────────────────────────────────────────────────────────────────
 const S = {
   app: {
-    background: "#F1F5F9",
+    background: "#F8FAFC",
     minHeight: "100vh",
     maxWidth: 430,
     margin: "0 auto",
@@ -489,7 +489,7 @@ const S = {
     transform: "translateX(-50%)",
     width: "100%",
     maxWidth: 430,
-    background: "rgba(255,255,255,0.95)",
+    background: "#E2E8F0",
     backdropFilter: "blur(20px)",
     borderTop: "1px solid rgba(15,23,42,0.08)",
     display: "flex",
@@ -639,7 +639,7 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
 
       <div style={{ padding: "0 16px" }}>
         {/* Phase Progress */}
-        <div style={{ ...S.card("#F1F5F9"), marginBottom: 12 }}>
+        <div style={{ ...S.card("#F8FAFC"), marginBottom: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
             <div>
               <div style={{ fontSize: 11, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.08em" }}>Training Phase</div>
@@ -664,7 +664,7 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
                 }
               }} style={{
                 flex: 1, padding: "8px 4px", borderRadius: 10, border: "none", cursor: "pointer",
-                background: i === phaseIndex ? p.color : "#F1F5F9",
+                background: i === phaseIndex ? p.color : "#F8FAFC",
                 color: i === phaseIndex ? "#000" : "#666",
                 fontSize: 11, fontWeight: 700, transition: "all 0.2s",
                 outline: i === phaseIndex ? "none" : "1px solid rgba(15,23,42,0.08)",
@@ -698,7 +698,7 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
         </div>
 
         {/* Today's Workout Card */}
-        <div style={{ ...S.card(`${accentColor}33`), marginBottom: 16, background: `linear-gradient(135deg, rgba(37,99,235,0.03), rgba(10,10,15,1))` }}>
+        <div style={{ ...S.card(`${accentColor}33`), marginBottom: 16, background: "linear-gradient(135deg, rgba(37,99,235,0.04), #FFFFFF)" }}>
           {/* Workout title row */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
             <div>
@@ -724,14 +724,14 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
                 <button key={w.key} onClick={() => setActiveDayKey(w.key)} style={{
                   flex: allWorkouts.length > 3 ? "1 1 calc(50% - 3px)" : 1,
                   padding: "8px 4px", borderRadius: 10, border: "none", cursor: "pointer",
-                  background: isActive ? accentColor : isToday ? `${accentColor}22` : "#F1F5F9",
-                  color: isActive ? "#000" : isToday ? accentColor : "#666",
+                  background: isActive ? accentColor : isToday ? `${accentColor}22` : "#F8FAFC",
+                  color: isActive ? "#FFFFFF" : isToday ? accentColor : "#64748B",
                   fontSize: 11, fontWeight: 700, transition: "all 0.2s",
                   outline: isActive ? "none" : isToday ? `2px solid ${accentColor}88` : "1px solid rgba(15,23,42,0.08)",
                 }}>
                   <div style={{ fontSize: 14, marginBottom: 1 }}>{w.icon}</div>
                   <div>{w.name}</div>
-                  <div style={{ fontSize: 9, marginTop: 1, opacity: isToday ? 1 : 0, color: isActive ? "#00000088" : accentColor }}>Today</div>
+                  <div style={{ fontSize: 9, marginTop: 1, opacity: isToday ? 1 : 0, color: isActive ? "#E2E8F0" : accentColor }}>Today</div>
                 </button>
               );
             })}
@@ -741,7 +741,7 @@ const HomeScreen = ({ user, weightLogs, exerciseLogs, phase, dayKey, phaseDay, w
             {workout.exercises.slice(0, 3).map((ex, i) => (
               <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: 8, background: `${accentColor}22`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: accentColor }}>{i + 1}</div>
+                  <div style={{ width: 28, height: 28, borderRadius: 8, background: `${accentColor}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: accentColor }}>{i + 1}</div>
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 600 }}>{ex.name}</div>
                     <div style={{ fontSize: 11, color: "#94A3B8" }}>{ex.muscle}</div>
@@ -892,7 +892,7 @@ const RestTimer = ({ onDone, accentColor }) => {
         {done ? "Rest Complete!" : "Rest Timer"}
       </div>
       <svg width={120} height={120} viewBox="0 0 100 100">
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={6}/>
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke="#E2E8F0" strokeWidth={6}/>
         <circle cx={cx} cy={cy} r={r} fill="none" stroke={done ? "#2563EB" : accentColor} strokeWidth={6}
           strokeDasharray={circ} strokeDashoffset={circ * (1 - pct)}
           strokeLinecap="round" transform="rotate(-90 50 50)"
@@ -968,7 +968,7 @@ const AddExercisePanel = ({ workout, onAdd, onClose, accentColor }) => {
           <div style={{ fontSize:32, marginBottom:12 }}>✅</div>
           <div style={{ fontSize:16, fontWeight:700, marginBottom:8 }}>All alternatives added</div>
           <div style={{ fontSize:13, color:"#666", marginBottom:24 }}>You've already added every available exercise for today's muscle groups.</div>
-          <button onClick={onClose} style={{ background:accentColor, border:"none", borderRadius:14, padding:"14px 32px", color:"#000", fontSize:15, fontWeight:700, cursor:"pointer", width:"100%" }}>Done</button>
+          <button onClick={onClose} style={{ background:accentColor, border:"none", borderRadius:14, padding:"14px 32px", color:"#FFFFFF", fontSize:15, fontWeight:700, cursor:"pointer", width:"100%" }}>Done</button>
         </div>
       </>
     );
@@ -983,7 +983,7 @@ const AddExercisePanel = ({ workout, onAdd, onClose, accentColor }) => {
   };
 
   const stepStyle = (color) => ({
-    background: "#F8FAFC", border: "1px solid rgba(255,255,255,0.12)",
+    background: "#F8FAFC", border: "1px solid #CBD5E1",
     borderRadius: 12, width: 48, height: 48, display: "flex", alignItems: "center",
     justifyContent: "center", cursor: "pointer", flexShrink: 0, color,
   });
@@ -1008,13 +1008,13 @@ const AddExercisePanel = ({ workout, onAdd, onClose, accentColor }) => {
             <div style={{ fontSize:11, color:"#666", textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:3 }}>Add Exercise</div>
             <div style={{ fontSize:18, fontWeight:800 }}>Browse options</div>
           </div>
-          <button onClick={onClose} style={{ background:"rgba(255,255,255,0.08)", border:"none", borderRadius:10, width:36, height:36, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#888", fontSize:18 }}>✕</button>
+          <button onClick={onClose} style={{ background:"#E2E8F0", border:"none", borderRadius:10, width:36, height:36, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#888", fontSize:18 }}>✕</button>
         </div>
 
         <div style={{ padding:"0 20px" }}>
           {/* Exercise card with prev/next navigation */}
           <div style={{
-            background:"rgba(255,255,255,0.04)", border:`1px solid ${accentColor}33`,
+            background:"#E2E8F0", border:`1px solid ${accentColor}33`,
             borderRadius:20, padding:"20px", marginBottom:16,
           }}>
             {/* Nav arrows + name */}
@@ -1038,7 +1038,7 @@ const AddExercisePanel = ({ workout, onAdd, onClose, accentColor }) => {
               {candidates.map((_, i) => (
                 <div key={i} onClick={() => setIdx(i)} style={{
                   width: i === idx ? 18 : 6, height:6, borderRadius:3,
-                  background: i === idx ? accentColor : "rgba(255,255,255,0.15)",
+                  background: i === idx ? accentColor : "#E2E8F0",
                   cursor:"pointer", transition:"all 0.2s",
                 }}/>
               ))}
@@ -1330,7 +1330,7 @@ const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
   return (
     <>
       <div onClick={onClose} style={{
-        position: "fixed", inset: 0, background: "rgba(15,23,42,0.6)",
+        position: "fixed", inset: 0, background: "rgba(15,23,42,0.5)",
         zIndex: 500, backdropFilter: "blur(6px)",
       }} />
       <div style={{
@@ -1343,7 +1343,7 @@ const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
       }}>
         {/* Handle */}
         <div style={{ display: "flex", justifyContent: "center", padding: "14px 0 0" }}>
-          <div style={{ width: 40, height: 4, borderRadius: 2, background: "#CBD5E1" }} />
+          <div style={{ width: 40, height: 4, borderRadius: 2, background: "#E2E8F0" }} />
         </div>
 
         {/* Header */}
@@ -1353,7 +1353,7 @@ const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
             <div style={{ fontSize: 20, fontWeight: 800, lineHeight: 1.2 }}>{exerciseName}</div>
           </div>
           <button onClick={onClose} style={{
-            background: "rgba(15,23,42,0.06)", border: "none", borderRadius: 10,
+            background: "#F1F5F9", border: "none", borderRadius: 10,
             width: 36, height: 36, display: "flex", alignItems: "center",
             justifyContent: "center", cursor: "pointer", color: "#94A3B8", fontSize: 18, flexShrink: 0,
           }}>✕</button>
@@ -1367,7 +1367,7 @@ const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
               <div style={{ display: "flex", gap: 8 }}>
                 {imgs_list.map((src, i) => (
                   failedImgs[i] ? null : (
-                    <div key={i} style={{ flex: 1, borderRadius: 14, overflow: "hidden", background: "#F1F5F9", position: "relative" }}>
+                    <div key={i} style={{ flex: 1, borderRadius: 14, overflow: "hidden", background: "#F8FAFC", position: "relative" }}>
                       <div style={{ position: "absolute", top: 6, left: 6, background: "rgba(15,23,42,0.55)", borderRadius: 6, padding: "2px 7px", fontSize: 10, fontWeight: 700, color: "#0F172A", zIndex: 1 }}>
                         {i === 0 ? "Start" : i === imgs_list.length - 1 ? "End" : `Step ${i + 1}`}
                       </div>
@@ -1400,7 +1400,7 @@ const ExerciseInfoModal = ({ exerciseName, onClose, accentColor }) => {
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                 {info.muscles.map((m, i) => (
                   <div key={i} style={{
-                    background: i === 0 ? `${accentColor}18` : "#F1F5F9",
+                    background: i === 0 ? `${accentColor}18` : "#F8FAFC",
                     border: `1px solid ${i === 0 ? accentColor + "44" : "rgba(15,23,42,0.08)"}`,
                     borderRadius: 20, padding: "5px 12px",
                     fontSize: 12, fontWeight: 600,
@@ -1648,7 +1648,7 @@ const WorkoutScreen = ({ phase, dayKey, workoutDay, exerciseLogs, onSave, onFini
             <div style={{ display:"flex", alignItems:"center", gap:8 }}>
               <div style={{ fontSize:22, fontWeight:800, lineHeight:1.2 }}>{ex.name}</div>
               <button onClick={() => setShowInfoFor(ex.name)} style={{
-                background:"rgba(255,255,255,0.08)", border:"1px solid rgba(255,255,255,0.14)",
+                background:"#E2E8F0", border:"1px solid #CBD5E1",
                 borderRadius:"50%", width:24, height:24, display:"flex", alignItems:"center",
                 justifyContent:"center", cursor:"pointer", color:"#888", fontSize:13,
                 fontWeight:700, flexShrink:0, lineHeight:1,
@@ -1659,8 +1659,8 @@ const WorkoutScreen = ({ phase, dayKey, workoutDay, exerciseLogs, onSave, onFini
           {completedForCurrent === 0 && (
             <button onClick={handleSwap} style={{
               display:"flex", alignItems:"center", gap:6,
-              background: ex.swappedFrom ? "rgba(255,107,53,0.15)" : "rgba(255,255,255,0.07)",
-              border:`1px solid ${ex.swappedFrom ? "rgba(255,107,53,0.4)" : "rgba(255,255,255,0.12)"}`,
+              background: ex.swappedFrom ? "rgba(255,107,53,0.15)" : "#E2E8F0",
+              border:`1px solid ${ex.swappedFrom ? "rgba(255,107,53,0.4)" : "#E2E8F0"}`,
               borderRadius:10, padding:"7px 12px", cursor:"pointer", flexShrink:0,
               color: ex.swappedFrom ? "#DC2626" : "#aaa", fontSize:12, fontWeight:700,
             }}>
@@ -1764,8 +1764,8 @@ const WorkoutScreen = ({ phase, dayKey, workoutDay, exerciseLogs, onSave, onFini
                 onClick={() => { if (!done) return; setEditingSet(isEditing ? null : { exName: ex.name, setIdx: i }); }}
                 style={{
                   flex:1, minHeight:64, borderRadius:12,
-                  background: isEditing ? `${accentColor}33` : done ? `${accentColor}22` : "rgba(255,255,255,0.05)",
-                  border:`1px solid ${isEditing ? accentColor : done ? accentColor+"44" : "rgba(255,255,255,0.08)"}`,
+                  background: isEditing ? `${accentColor}33` : done ? `${accentColor}22` : "#E2E8F0",
+                  border:`1px solid ${isEditing ? accentColor : done ? accentColor+"44" : "#E2E8F0"}`,
                   display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
                   transition:"all 0.2s", cursor: done ? "pointer" : "default", padding:"6px 4px",
                 }}>
@@ -1776,12 +1776,12 @@ const WorkoutScreen = ({ phase, dayKey, workoutDay, exerciseLogs, onSave, onFini
                     <input type="number" inputMode="decimal" value={setInfo?.w} autoFocus
                       onChange={e => handleEditSet(ex.name, i, "w", e.target.value)}
                       onFocus={e => e.target.select()}
-                      style={{ background:"#F1F5F9", border:"1px solid rgba(15,23,42,0.10)", borderRadius:6, color:"#0F172A", fontSize:14, fontWeight:700, textAlign:"center", width:"100%", outline:"none", padding:"4px 0" }}/>
+                      style={{ background:"#F8FAFC", border:"1px solid rgba(15,23,42,0.10)", borderRadius:6, color:"#0F172A", fontSize:14, fontWeight:700, textAlign:"center", width:"100%", outline:"none", padding:"4px 0" }}/>
                     <div style={{ fontSize:9, color:"#666", textAlign:"center", textTransform:"uppercase" }}>reps</div>
                     <input type="number" inputMode="numeric" value={setInfo?.r}
                       onChange={e => handleEditSet(ex.name, i, "r", e.target.value)}
                       onFocus={e => e.target.select()}
-                      style={{ background:"#F1F5F9", border:"1px solid rgba(15,23,42,0.10)", borderRadius:6, color:"#64748B", fontSize:12, textAlign:"center", width:"100%", outline:"none", padding:"3px 0" }}/>
+                      style={{ background:"#F8FAFC", border:"1px solid rgba(15,23,42,0.10)", borderRadius:6, color:"#64748B", fontSize:12, textAlign:"center", width:"100%", outline:"none", padding:"3px 0" }}/>
                   </div>
                 ) : done ? (
                   <>
@@ -1879,7 +1879,7 @@ const WeightScreen = ({ weightLogs, onLog, accentColor }) => {
 
       {/* Log weight */}
       <div style={{ ...S.card(), marginBottom: 12 }}>
-        <div style={{ fontSize: 12, color: "#94A3B8", marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.08em" }}>Log Today's Weight</div>
+        <div style={{ fontSize: 12, color: "#64748B", marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.08em" }}>Log Today's Weight</div>
         <div style={{ display: "flex", gap: 10 }}>
           <input
             type="number" inputMode="decimal"
@@ -1888,8 +1888,8 @@ const WeightScreen = ({ weightLogs, onLog, accentColor }) => {
             onChange={e => setInputVal(e.target.value)}
             onKeyDown={e => e.key === "Enter" && handleLog()}
             style={{
-              flex: 1, background: "#F8FAFC",
-              border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12,
+              flex: 1, background: "#FFFFFF",
+              border: "1px solid #CBD5E1", borderRadius: 12,
               color: "#0F172A", fontSize: 20, fontWeight: 700,
               padding: "14px 16px", outline: "none",
             }}
@@ -1899,7 +1899,7 @@ const WeightScreen = ({ weightLogs, onLog, accentColor }) => {
             style={{
               ...S.bigBtn(logged ? "#1a3a2a" : accentColor),
               flex: 0, padding: "14px 20px", fontSize: 14,
-              color: logged ? "#2563EB" : "#000",
+              color: logged ? "#FFFFFF" : "#FFFFFF",
             }}
           >
             {logged ? "✓" : "Log"}
@@ -1970,7 +1970,7 @@ const ExerciseProgressChart = ({ exerciseName, logs, accentColor, onClose }) => 
           <div style={{ fontSize: 12, color: "#94A3B8", marginTop: 4 }}>{history.length} session{history.length !== 1 ? "s" : ""} logged</div>
         </div>
         <button onClick={onClose} style={{
-          background: "rgba(15,23,42,0.06)", border: "none", borderRadius: 12,
+          background: "#F1F5F9", border: "none", borderRadius: 12,
           width: 40, height: 40, cursor: "pointer", display: "flex",
           alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 4,
           color: "#64748B", fontSize: 20,
@@ -1993,7 +1993,7 @@ const ExerciseProgressChart = ({ exerciseName, logs, accentColor, onClose }) => 
         </div>
 
         {/* Weight chart */}
-        <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 20, padding: "16px 12px 10px", border: "1px solid rgba(15,23,42,0.08)", marginBottom: 20 }}>
+        <div style={{ background: "#E2E8F0", borderRadius: 20, padding: "16px 12px 10px", border: "1px solid rgba(15,23,42,0.08)", marginBottom: 20 }}>
           <div style={{ fontSize: 12, color: "#94A3B8", marginBottom: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" }}>Weight Over Time</div>
           {chartData.length >= 2 ? (
             <>
@@ -2018,8 +2018,8 @@ const ExerciseProgressChart = ({ exerciseName, logs, accentColor, onClose }) => 
             <div key={i} style={{
               display: "flex", justifyContent: "space-between", alignItems: "center",
               padding: "13px 16px", marginBottom: 8,
-              background: isLatest ? `${accentColor}0d` : "rgba(255,255,255,0.03)",
-              border: `1px solid ${isLatest ? accentColor + "33" : "rgba(255,255,255,0.07)"}`,
+              background: isLatest ? `${accentColor}0d` : "#E2E8F0",
+              border: `1px solid ${isLatest ? accentColor + "33" : "#E2E8F0"}`,
               borderRadius: 14,
             }}>
               <div>
@@ -2092,7 +2092,7 @@ const HistoryScreen = ({ exerciseLogs, accentColor }) => {
               transition: "border-color 0.15s",
             }}
             onMouseEnter={e => e.currentTarget.style.borderColor = accentColor + "55"}
-            onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"}
+            onMouseLeave={e => e.currentTarget.style.borderColor = "#E2E8F0"}
           >
             <div>
               <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A", marginBottom: 4 }}>{name}</div>
@@ -2163,7 +2163,7 @@ const ProfileScreen = ({ user, phase, authUser, cloudLoading, onReset, onSaveNam
   };
 
   const inputStyle = {
-    background: "#F8FAFC", border: "1px solid rgba(255,255,255,0.12)",
+    background: "#F8FAFC", border: "1px solid #CBD5E1",
     borderRadius: 12, color: "#0F172A", fontSize: 15, width: "100%",
     padding: "13px 14px", outline: "none", boxSizing: "border-box", marginBottom: 10,
   };
@@ -2253,7 +2253,7 @@ const ProfileScreen = ({ user, phase, authUser, cloudLoading, onReset, onSaveNam
           </div>
 
           {/* Toggle */}
-          <div style={{ display: "flex", background: "rgba(255,255,255,0.05)", borderRadius: 10, padding: 3, marginBottom: 14 }}>
+          <div style={{ display: "flex", background: "#E2E8F0", borderRadius: 10, padding: 3, marginBottom: 14 }}>
             {["login", "signup"].map(m => (
               <button key={m} onClick={() => { setAuthMode(m); setAuthError(""); setAuthMessage(""); }} style={{
                 flex: 1, padding: "9px", borderRadius: 8, border: "none",
@@ -2358,7 +2358,7 @@ const OnboardingScreen = ({ onComplete, accentColor }) => {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F1F5F9", display: "flex", flexDirection: "column" }}>
+    <div style={{ minHeight: "100vh", background: "#F8FAFC", display: "flex", flexDirection: "column" }}>
       {/* Progress bar */}
       <div style={{ height: 3, background: "#F8FAFC", position: "fixed", top: 0, left: 0, right: 0, zIndex: 10 }}>
         <div style={{ height: "100%", background: "#2563EB", width: `${((step + 1) / totalSteps) * 100}%`, transition: "width 0.4s ease" }} />
@@ -2385,8 +2385,8 @@ const OnboardingScreen = ({ onComplete, accentColor }) => {
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 {opts.map(g => (
                   <button key={g.id} onClick={() => setGender(g.id)} style={{
-                    background: gender === g.id ? g.sel : "rgba(255,255,255,0.04)",
-                    border: `2px solid ${gender === g.id ? g.border : "rgba(255,255,255,0.09)"}`,
+                    background: gender === g.id ? g.sel : "#E2E8F0",
+                    border: `2px solid ${gender === g.id ? g.border : "#E2E8F0"}`,
                     borderRadius: 18, padding: "20px 22px", cursor: "pointer",
                     display: "flex", alignItems: "center", gap: 18, textAlign: "left",
                     transition: "all 0.2s",
@@ -2394,7 +2394,7 @@ const OnboardingScreen = ({ onComplete, accentColor }) => {
                     <span style={{
                       fontSize: 32, width: 52, height: 52, borderRadius: "50%",
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      background: gender === g.id ? g.sel : "rgba(255,255,255,0.07)",
+                      background: gender === g.id ? g.sel : "#E2E8F0",
                       flexShrink: 0,
                     }}>{g.icon}</span>
                     <div style={{ fontSize: 17, fontWeight: 800, color: gender === g.id ? g.border : "#fff" }}>
@@ -2412,8 +2412,8 @@ const OnboardingScreen = ({ onComplete, accentColor }) => {
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {GOALS.map(g => (
                 <button key={g.id} onClick={() => setGoal(g.id)} style={{
-                  background: goal === g.id ? "rgba(37,99,235,0.08)" : "rgba(255,255,255,0.04)",
-                  border: `1px solid ${goal === g.id ? "#2563EB" : "rgba(255,255,255,0.09)"}`,
+                  background: goal === g.id ? "rgba(37,99,235,0.08)" : "#E2E8F0",
+                  border: `1px solid ${goal === g.id ? "#2563EB" : "#E2E8F0"}`,
                   borderRadius: 16, padding: "16px 18px", cursor: "pointer",
                   display: "flex", alignItems: "center", gap: 14, textAlign: "left",
                   transition: "all 0.18s",
@@ -2436,8 +2436,8 @@ const OnboardingScreen = ({ onComplete, accentColor }) => {
                 const sel = equipment.includes(e.id);
                 return (
                   <button key={e.id} onClick={() => toggleEquip(e.id)} style={{
-                    background: sel ? "rgba(37,99,235,0.08)" : "rgba(255,255,255,0.04)",
-                    border: `1px solid ${sel ? "#2563EB" : "rgba(255,255,255,0.09)"}`,
+                    background: sel ? "rgba(37,99,235,0.06)" : "#FFFFFF",
+                    border: `1px solid ${sel ? "#2563EB" : "#E2E8F0"}`,
                     borderRadius: 14, padding: "16px 12px", cursor: "pointer",
                     opacity: 1, transition: "all 0.18s", textAlign: "center",
                   }}>
@@ -2454,8 +2454,8 @@ const OnboardingScreen = ({ onComplete, accentColor }) => {
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {FREQUENCY_OPTIONS.map(f => (
                 <button key={f.id} onClick={() => setFrequency(f.id)} style={{
-                  background: frequency === f.id ? "rgba(37,99,235,0.08)" : "rgba(255,255,255,0.04)",
-                  border: `1px solid ${frequency === f.id ? "#2563EB" : "rgba(255,255,255,0.09)"}`,
+                  background: frequency === f.id ? "rgba(37,99,235,0.08)" : "#E2E8F0",
+                  border: `1px solid ${frequency === f.id ? "#2563EB" : "#E2E8F0"}`,
                   borderRadius: 16, padding: "18px 20px", cursor: "pointer",
                   display: "flex", justifyContent: "space-between", alignItems: "center",
                   transition: "all 0.18s",
@@ -2481,7 +2481,7 @@ const OnboardingScreen = ({ onComplete, accentColor }) => {
                 autoFocus
                 style={{
                   width: "100%", background: "#F8FAFC",
-                  border: "1px solid rgba(255,255,255,0.14)", borderRadius: 16,
+                  border: "1px solid #CBD5E1", borderRadius: 16,
                   color: "#0F172A", fontSize: 22, fontWeight: 700,
                   padding: "18px 20px", outline: "none", boxSizing: "border-box",
                   marginBottom: 16,
@@ -2512,7 +2512,7 @@ const OnboardingScreen = ({ onComplete, accentColor }) => {
       </div>
 
       {/* Bottom nav */}
-      <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, padding: "16px 20px 36px", background: "linear-gradient(transparent, #F1F5F9 40%)" }}>
+      <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, padding: "16px 20px 36px", background: "linear-gradient(rgba(241,245,249,0), #F1F5F9 50%)" }}>
         {/* Skip setup */}
         <button onClick={() => onComplete({
           gender: "other", goal: "general_fitness",
@@ -2538,7 +2538,7 @@ const OnboardingScreen = ({ onComplete, accentColor }) => {
             disabled={!canAdvance[step]}
             style={{
               flex: 1, padding: "16px", borderRadius: 16, border: "none",
-              background: canAdvance[step] ? "#2563EB" : "rgba(255,255,255,0.07)",
+              background: canAdvance[step] ? "#2563EB" : "#E2E8F0",
               color: canAdvance[step] ? "#000" : "#444",
               fontSize: 16, fontWeight: 800, cursor: canAdvance[step] ? "pointer" : "default",
               transition: "all 0.2s",
@@ -2589,7 +2589,7 @@ const AuthScreen = ({ onAuth }) => {
   };
 
   const inputStyle = {
-    background: "#F8FAFC", border: "1px solid rgba(255,255,255,0.12)",
+    background: "#FFFFFF", border: "1px solid #CBD5E1",
     borderRadius: 14, color: "#0F172A", fontSize: 16, width: "100%",
     padding: "15px 16px", outline: "none", boxSizing: "border-box",
     marginBottom: 12,
@@ -2597,7 +2597,7 @@ const AuthScreen = ({ onAuth }) => {
 
   return (
     <div style={{
-      minHeight: "100vh", background: "#F1F5F9", display: "flex",
+      minHeight: "100vh", background: "#F8FAFC", display: "flex",
       flexDirection: "column", alignItems: "center", justifyContent: "center",
       padding: "0 24px",
     }}>
@@ -2605,7 +2605,7 @@ const AuthScreen = ({ onAuth }) => {
       <div style={{
         position: "fixed", top: -80, left: "50%", transform: "translateX(-50%)",
         width: 300, height: 300, borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%)",
+        background: "radial-gradient(circle, rgba(37,99,235,0.12) 0%, transparent 70%)",
         pointerEvents: "none",
       }} />
 
@@ -2613,10 +2613,10 @@ const AuthScreen = ({ onAuth }) => {
         {/* Logo */}
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <div style={{
-            width: 72, height: 72, borderRadius: 20, background: "#141420",
-            border: "1px solid rgba(0,255,136,0.3)", display: "flex",
+            width: 72, height: 72, borderRadius: 20, background: "#2563EB",
+            border: "none", display: "flex",
             alignItems: "center", justifyContent: "center", margin: "0 auto 16px",
-            boxShadow: "0 0 32px rgba(37,99,235,0.10)",
+            boxShadow: "0 4px 24px rgba(37,99,235,0.25)",
           }}>
             <span style={{ fontSize: 32 }}>⚡</span>
           </div>
@@ -2628,14 +2628,14 @@ const AuthScreen = ({ onAuth }) => {
 
         {/* Toggle */}
         <div style={{
-          display: "flex", background: "rgba(255,255,255,0.05)",
+          display: "flex", background: "#E2E8F0",
           borderRadius: 12, padding: 4, marginBottom: 24,
         }}>
           {["login", "signup"].map(m => (
             <button key={m} onClick={() => { setMode(m); setError(""); setMessage(""); }} style={{
               flex: 1, padding: "10px", borderRadius: 9, border: "none",
               background: mode === m ? "#2563EB" : "transparent",
-              color: mode === m ? "#000" : "#666",
+              color: mode === m ? "#FFFFFF" : "#64748B",
               fontWeight: 700, fontSize: 14, cursor: "pointer",
               transition: "all 0.2s", textTransform: "capitalize",
             }}>
@@ -2676,10 +2676,10 @@ const AuthScreen = ({ onAuth }) => {
             width: "100%", padding: "17px", borderRadius: 16,
             background: loading || !email || !password
               ? "#E2E8F0" : "linear-gradient(135deg, #2563EB, #1D4ED8)",
-            color: loading || !email || !password ? "#555" : "#000",
+            color: loading || !email || !password ? "#94A3B8" : "#FFFFFF",
             fontSize: 17, fontWeight: 800, border: "none",
             cursor: loading || !email || !password ? "default" : "pointer",
-            boxShadow: loading ? "none" : "0 4px 24px rgba(0,255,136,0.3)",
+            boxShadow: loading ? "none" : "0 4px 20px rgba(37,99,235,0.35)",
             transition: "all 0.2s",
           }}
         >
@@ -2754,40 +2754,68 @@ export default function App() {
   // ── Load cloud data when user logs in ────────────────────────────────────
   useEffect(() => {
     if (!authUser) return;
-    loadCloudData();
-  }, [authUser]);
+    loadCloudData(authUser);
+  }, [authUser?.id]);
 
-  const loadCloudData = async () => {
+  const loadCloudData = async (user) => {
+    if (!user?.id) return;
     setCloudLoading(true);
     try {
-      const { data: prof } = await supabase
-        .from("profiles").select("*").eq("id", authUser.id).maybeSingle();
+      const { data: prof, error: profErr } = await supabase
+        .from("profiles").select("*").eq("id", user.id).maybeSingle();
+      if (profErr) throw profErr;
 
       if (prof) {
         setCloudProfile(prof);
         setCloudWorkoutCount(prof.workout_count || 0);
       } else {
+        // First login — create profile, optionally migrate guest data
+        const guest = getStore("user", {});
         const newProf = {
-          id: authUser.id,
-          name: authUser.user_metadata?.display_name || "Athlete",
-          current_weight: null,
-          start_date: new Date().toISOString(),
-          workout_count: 0,
+          id: user.id,
+          name: guest.name || user.user_metadata?.display_name || "Athlete",
+          current_weight: guest.current_weight || null,
+          start_date: guest.start_date || new Date().toISOString(),
+          workout_count: getStore("workoutCount", 0),
+          gender: guest.gender || null,
+          goal: guest.goal || null,
+          equipment: guest.equipment || null,
+          split: guest.split || null,
+          phase_override: guest.phase_override || null,
+          phase_start_date: guest.phase_start_date || null,
         };
-        await supabase.from("profiles").insert(newProf);
+        const { error: insertErr } = await supabase.from("profiles").insert(newProf);
+        if (insertErr) throw insertErr;
         setCloudProfile(newProf);
+        setCloudWorkoutCount(newProf.workout_count);
+
+        // Migrate guest exercise + weight logs to cloud
+        const guestELogs = getStore("exerciseLogs", []);
+        const guestWLogs = getStore("weightLogs", []);
+        if (guestELogs.length > 0) {
+          await supabase.from("exercise_logs").insert(
+            guestELogs.map(l => ({ ...l, user_id: user.id, id: undefined }))
+          );
+        }
+        if (guestWLogs.length > 0) {
+          await supabase.from("weight_logs").insert(
+            guestWLogs.map(l => ({ ...l, user_id: user.id, id: undefined }))
+          );
+        }
       }
 
-      const { data: wLogs } = await supabase.from("weight_logs")
-        .select("*").eq("user_id", authUser.id).order("date", { ascending: true });
+      const { data: wLogs, error: wErr } = await supabase.from("weight_logs")
+        .select("*").eq("user_id", user.id).order("date", { ascending: true });
+      if (wErr) throw wErr;
       setCloudWeightLogs(wLogs || []);
 
-      const { data: eLogs } = await supabase.from("exercise_logs")
-        .select("*").eq("user_id", authUser.id).order("date", { ascending: true });
+      const { data: eLogs, error: eErr } = await supabase.from("exercise_logs")
+        .select("*").eq("user_id", user.id).order("date", { ascending: true });
+      if (eErr) throw eErr;
       setCloudExerciseLogs(eLogs || []);
 
     } catch (e) {
-      console.error("Cloud load error:", e);
+      console.error("Cloud load error:", e.message || e);
     } finally {
       setCloudLoading(false);
     }
@@ -2868,7 +2896,7 @@ export default function App() {
       await supabase.from("profiles").update({
         workout_count: 0, current_weight: null, start_date: new Date().toISOString(),
       }).eq("id", authUser.id);
-      await loadCloudData();
+      await loadCloudData(authUser);
     } else {
       setGuestExerciseLogs([]);
       setGuestWeightLogs([]);
